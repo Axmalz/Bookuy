@@ -1,0 +1,105 @@
+/* * Pengaturan Dasar Halaman
+ * Ini menengahkan bingkai ponsel di tengah jendela browser.
+ */
+
+@font-face {
+    font-family: 'Sugo-Pro';
+    src: url('/fonts/Sugo-Pro-Classic-Regular-trial.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #e0e0e0; /* Latar belakang abu-abu untuk browser */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+/* * Bingkai Ponsel (iPhone 14)
+ */
+.mobile-frame {
+    width: 390px;  /* Lebar iPhone 14 */
+    height: 844px; /* Tinggi iPhone 14 */
+    border: 14px solid #1c1c1c; /* Warna bingkai hitam */
+    border-radius: 54px; /* Sudut melengkung */
+    background-color: #fff; /* Latar belakang layar default */
+    box-shadow: 0 12px 50px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden; /* Memotong konten yang keluar dari layar */
+    display: flex;
+    flex-direction: column;
+}
+
+/* * Notch / Poni
+ */
+.notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 34px;
+    background-color: #1c1c1c; /* Warna hitam sama dengan bingkai */
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    z-index: 10; /* Tampil di atas konten layar */
+}
+
+/* * Area Layar
+ * Ini adalah tempat konten blade Anda akan ditampilkan.
+ */
+.screen {
+    width: 100%;
+    height: 100%;
+    background-color: #fff; /* Latar belakang putih standar */
+    overflow-y: auto;   /* Izinkan scrolling jika konten panjang */
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* * --- Gaya Khusus Splash Screen ---
+ */
+.splash-screen {
+    width: 100%;
+    height: 100%;
+    /* Warna biru dari gambar Anda */
+    background-color: #2563EB;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px; /* Jarak antara logo dan spinner */
+    box-sizing: border-box;
+}
+
+/* Logo di splash screen */
+.splash-logo {
+    width: 120px; /* Sesuaikan ukuran logo Anda */
+    height: auto;
+}
+
+/* * Animasi Spinner
+ */
+.spinner {
+    width: 50px;
+    height: 50px;
+    /* Garis abu-abu muda sebagai dasar */
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    /* Garis putih penuh untuk bagian yang berputar */
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    /* Memanggil animasi 'spin' */
+    animation: spin 1s linear infinite;
+}
+
+/* Keyframe untuk animasi berputar */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
