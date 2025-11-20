@@ -345,7 +345,44 @@
         if(currentMode === 'sewa') { actionBtn.className = "flex-1 py-3 bg-blue-400 text-white rounded-full text-center font-bold text-sm shadow-lg"; }
         else { actionBtn.className = "flex-1 py-3 bg-yellow-500 text-white rounded-full text-center font-bold text-sm shadow-lg"; }
     }
-    window.showSuccessState = function() { contentConfirm.classList.add('hidden'); contentSuccess.classList.remove('hidden'); contentSuccess.classList.add('flex'); }
+    window.showSuccessState = function() {
+        // 1. Ambil data yang diperlukan
+        const bookId = {{ $book->id }};
+        const type = currentMode; // 'sewa' atau 'beli'
+        const qty = quantity;
+
+        // 2. Kirim Request AJAX ke Server
+        fetch('{{ route("cart.add") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json' // Minta respons JSON
+            },
+            body: JSON.stringify({
+                book_id: bookId,
+                type: type,
+                quantity: qty
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                // 3. Jika Sukses, Update UI Modal
+                contentConfirm.classList.add('hidden');
+                contentSuccess.classList.remove('hidden');
+                contentSuccess.classList.add('flex');
+
+                // Optional: Update badge keranjang di header jika ada
+                // updateCartCount();
+            } else {
+                alert('Gagal menambahkan ke keranjang. Silakan coba lagi.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan jaringan.');
+        });
+    }
     overlay.addEventListener('click', closePurchaseModal);
 </script>
 @endpush

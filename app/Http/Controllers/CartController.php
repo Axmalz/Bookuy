@@ -45,7 +45,7 @@ class CartController extends Controller
         ]);
     }
 
-    // Menambah item ke keranjang (AJAX / Form)
+// Menambah item ke keranjang
     public function add(Request $request)
     {
         $user = Auth::user();
@@ -59,20 +59,22 @@ class CartController extends Controller
         $existingItem = $cart->items()->where('book_id', $bookId)->where('type', $type)->first();
 
         if ($existingItem) {
-            // Update quantity
             $existingItem->quantity += $quantity;
             $existingItem->save();
         } else {
-            // Buat item baru
             $cart->items()->create([
                 'book_id' => $bookId,
                 'type' => $type,
                 'quantity' => $quantity,
-                'is_selected' => true // Default checked saat baru masuk
+                'is_selected' => true
             ]);
         }
 
-        // Redirect balik dengan pesan sukses (bisa diganti JSON jika pakai AJAX murni)
+        // PERBAIKAN: Cek apakah request menginginkan JSON (AJAX)
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Berhasil ditambahkan']);
+        }
+
         return redirect()->route('cart.index', ['tab' => $type])->with('success', 'Berhasil ditambahkan ke keranjang');
     }
 
