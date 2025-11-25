@@ -6,34 +6,31 @@
     <!-- 1. Bagian Header (Gradien Biru) -->
     <div class="w-full h-48 bg-gradient-to-b from-blue-600 to-blue-500 pt-12 px-6 relative">
         <div class="flex justify-between items-center">
-
-            <!-- 2. Logo dan Sapaan -->
-            <!--
-              Tambahkan 'min-w-0' dan 'flex-1' pada container teks
-              agar truncate berfungsi jika ruang menyempit
-            -->
+            <!-- ... (Logo & Sapaan Tetap Sama) ... -->
             <div class="flex items-center gap-3 flex-1 min-w-0 mr-4">
                 <img src="{{ asset('images/logo-white.png') }}" alt="Logo" class="w-10 h-auto flex-shrink-0">
                 <div class="min-w-0 flex-1">
                     <span class="text-white text-lg font-medium block">Welcome</span>
-                    <!--
-                      1. Ambil nama depan: explode(' ', $name)[0]
-                      2. Tambahkan class 'truncate' untuk titik-titik jika terlalu panjang
-                    -->
                     <h2 class="text-white text-xl font-bold -mt-1 truncate block" title="{{ Auth::user()->name }}">
                         {{ explode(' ', Auth::user()->name)[0] }}!
                     </h2>
                 </div>
             </div>
 
-            <!-- 3. Tombol Keranjang (Flex-shrink-0 agar tidak tergencet) -->
+            <!-- 3. Tombol Keranjang (FIXED BADGE) -->
             <a href="{{ route('cart.index') }}" class="text-white relative flex-shrink-0">
                 <img src="{{ asset('images/icon-cart-white.png') }}" alt="Keranjang" class="w-7 h-7">
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+
+                <!-- Badge Indikator -->
+                @if($cartCount > 0)
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transform scale-100 transition-transform duration-200">
+                    {{ $cartCount }}
+                </span>
+                @endif
             </a>
         </div>
 
-        <!-- 4. Bilah Pencarian -->
+        <!-- ... (Sisa konten Home tetap sama) ... -->
         <a href="{{ route('search.index') }}" class="block mt-4">
             <div class="flex items-center w-full bg-transparent border-2 border-white/50 rounded-full p-3.5 shadow-lg">
                 <img src="{{ asset('images/icon-search.png') }}" alt="Search" class="w-5 h-5 mr-3">
@@ -44,10 +41,9 @@
         </a>
     </div>
 
-    <!-- Konten Utama -->
+    <!-- ... (Konten Bawah Home Tetap Sama) ... -->
     <div class="w-full px-6 pt-6">
-
-        <!-- 5. Bagian Kategori -->
+        <!-- ... -->
         <div class="flex justify-between items-center mb-3">
             <div>
                 <h3 class="text-xl font-bold text-gray-900">Kategori</h3>
@@ -58,7 +54,7 @@
             </a>
         </div>
 
-        <!-- 6. Scroll Horizontal Kategori -->
+        <!-- Scroll Kategori -->
         <div class="flex gap-3 overflow-x-auto pb-4 -mx-6 px-6" style="scrollbar-width: none; -ms-overflow-style: none; &::-webkit-scrollbar { display: none; }">
             @foreach($categories as $category)
             <a href="{{ route('search.index', ['category' => $category->name]) }}" class="flex-shrink-0 w-36">
@@ -74,7 +70,7 @@
             @endforeach
         </div>
 
-        <!-- 7. Bagian Recommended for you -->
+        <!-- Recommended -->
         <div class="mt-4">
             <h3 class="text-lg font-bold text-gray-900 mb-3">Recommended for you</h3>
             <div class="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6" style="scrollbar-width: none; -ms-overflow-style: none; &::-webkit-scrollbar { display: none; }">
@@ -89,7 +85,7 @@
             </div>
         </div>
 
-        <!-- 8. Bagian Popular books -->
+        <!-- Popular -->
         <div class="mt-4">
             <h3 class="text-lg font-bold text-gray-900 mb-3">Popular books</h3>
             <div class="space-y-4 pb-4">

@@ -3,42 +3,41 @@
 @section('content')
 <div class="w-full h-full bg-white flex flex-col relative">
 
-    <!--
-      1. Header (Sticky & Transition)
-      - z-40: Di atas konten (z-0), tapi di bawah modal (z-60) dan notch (z-50 dari layout)
-      - pt-12: Jarak aman dari atas layar
-    -->
-    <div id="product-header" class="absolute top-0 left-0 w-full z-40 px-6 pt-12 pb-4 flex justify-between items-center transition-colors duration-300 pointer-events-none">
+    <!-- 1. Header (Sticky & Transition) -->
+    <div id="product-header" class="absolute top-0 left-0 w-full z-40 px-6 pt-14 pb-4 flex justify-between items-center transition-colors duration-300 pointer-events-none">
 
         <!-- Tombol Back -->
         @php
             $prevUrl = url()->previous();
-            // Cek apakah URL sebelumnya adalah halaman produk yang sama (hasil filter)
-            $isSamePage = str_contains($prevUrl, request()->path());
-            $backUrl = $isSamePage ? route('home') : $prevUrl;
+            $isLooping = str_contains($prevUrl, request()->path()) && $prevUrl != route('home');
+            $backLink = $isLooping ? route('home') : $prevUrl;
         @endphp
-        <a href="{{ $backUrl }}" class="text-white drop-shadow-md hover:text-gray-200 transition-colors pointer-events-auto">
+        <a href="{{ $backLink }}" class="text-white drop-shadow-md hover:text-gray-200 transition-colors pointer-events-auto">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-7 h-7">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
         </a>
 
-        <!-- Logo Tengah (Diperbesar h-14 sesuai permintaan) -->
-        <img src="{{ asset('images/icon-bookuy-logo-white.png') }}" alt="Bookuy" class="h-14 w-auto drop-shadow-md pointer-events-auto">
+        <!-- Logo Tengah -->
+        <img src="{{ asset('images/icon-bookuy-logo-white.png') }}" alt="Bookuy" class="h-16 w-auto drop-shadow-md pointer-events-auto">
 
-        <!-- Tombol Keranjang -->
+        <!-- Tombol Keranjang (FIXED BADGE) -->
         <a href="{{ route('cart.index') }}" class="text-white drop-shadow-md relative hover:text-gray-200 transition-colors pointer-events-auto">
             <img src="{{ asset('images/icon-cart-white.png') }}" alt="Cart" class="w-7 h-7">
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+
+            <!-- Badge Indikator Dinamis -->
+            @if($cartCount > 0)
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transform scale-100 transition-transform duration-200" id="cart-badge">
+                {{ $cartCount }}
+            </span>
+            @endif
         </a>
     </div>
 
-    <!--
-      2. Konten Scrollable
-      - pb-[140px]: Ruang bawah untuk Sticky Bar
-    -->
-    <div id="product-scroll-container" class="flex-grow overflow-y-auto pb-[140px] no-scrollbar bg-white relative z-0">
+    <!-- ... (Sisa Konten Detail Produk Tetap Sama) ... -->
 
+    <!-- 2. Konten Scrollable -->
+    <div id="product-scroll-container" class="flex-grow overflow-y-auto pb-[140px] no-scrollbar bg-white relative z-0">
         <!-- Bagian Atas: Carousel -->
         <div class="relative w-full bg-blue-600 rounded-b-[50px] pb-10 pt-28 overflow-hidden shadow-xl z-10">
             <div id="carousel-container" class="relative w-full h-[380px] flex items-center justify-center perspective-1000">
@@ -58,7 +57,6 @@
                 </button>
             </div>
 
-            <!-- Judul & Penulis -->
             <div class="px-8 mt-6 text-left text-white">
                 <h1 class="font-sugo text-3xl tracking-wide leading-tight">{{ $book->judul_buku }}</h1>
                 <p class="font-poppins text-sm text-blue-100 mt-1">{{ $book->nama_penulis }}</p>
@@ -67,13 +65,11 @@
 
         <!-- Bagian Konten Putih -->
         <div class="px-6 pt-8 space-y-8">
-            <!-- Deskripsi -->
             <div>
                 <h3 class="font-bold text-gray-900 text-lg mb-2">Deskripsi Produk</h3>
                 <p class="text-gray-500 text-sm leading-relaxed text-justify">{{ $book->deskripsi_buku }}</p>
             </div>
 
-            <!-- Detail Info -->
             <div class="grid grid-cols-2 gap-y-4 text-sm">
                 <div class="text-gray-900 font-bold">Alamat</div>
                 <div class="text-gray-500 text-right">{{ $book->alamat_buku }}</div>
@@ -85,7 +81,6 @@
                 <div class="text-gray-500 text-right">{{ $book->jumlah_halaman }}</div>
             </div>
 
-            <!-- Penjual -->
             <div class="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
                 <div class="w-12 h-12 rounded-full bg-gray-300 overflow-hidden">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode($book->user->name) }}&background=random" class="w-full h-full object-cover">
@@ -97,7 +92,6 @@
                 </div>
             </div>
 
-            <!-- Rating -->
             <div>
                 <div class="flex items-end gap-2 mb-4">
                     <span class="text-5xl font-bold text-gray-900">{{ number_format($averageRating, 1) }}</span>
@@ -126,7 +120,6 @@
                 </div>
             </div>
 
-            <!-- Reviews & Filter -->
             <div>
                 <form id="review-filter-form" action="{{ route('product.show', $book->id) }}" method="GET">
                     <div class="flex justify-between items-center mb-4">
@@ -145,18 +138,15 @@
                                     <img src="{{ $i <= $review->rating ? asset('images/icon-star-full.png') : asset('images/icon-star-empty.png') }}" class="w-3 h-3">
                                 @endfor
                             </div>
-
-                            <!-- REVIEW SEE MORE LOGIC -->
                             <div class="text-sm text-gray-600 mb-2">
                                 @if(strlen($review->comment) > 100)
                                     <span class="short-text">{{ \Illuminate\Support\Str::limit($review->comment, 100) }}</span>
                                     <span class="full-text hidden">{{ $review->comment }}</span>
-                                    <button type="button" onclick="toggleReview(this)" class="text-gray-600 text-xs underline ml-1">...see more</button>
+                                    <button type="button" onclick="toggleReview(this)" class="text-blue-600 text-xs underline ml-1">...see more</button>
                                 @else
                                     {{ $review->comment }}
                                 @endif
                             </div>
-
                             <div class="flex items-center text-xs text-gray-400 gap-2">
                                 <span class="font-bold text-gray-800">{{ $review->user->name }}</span>
                                 <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
@@ -194,7 +184,7 @@
         </button>
     </div>
 
-    <!-- PURCHASE POPUP (Fixed Position) -->
+    <!-- PURCHASE POPUP -->
     <div id="modal-container" class="absolute inset-0 z-[60] pointer-events-none overflow-hidden">
         <div id="modal-overlay" class="absolute inset-0 bg-black/60 transition-opacity duration-300 opacity-0 pointer-events-auto hidden"></div>
         <div id="modal-sheet" class="absolute bottom-0 left-0 w-full bg-white rounded-t-[30px] transform translate-y-full transition-transform duration-300 flex flex-col pointer-events-auto shadow-2xl" style="max-height: 90%;">
@@ -204,6 +194,8 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
+
+            <!-- STATE 1: CONFIRM -->
             <div id="modal-content-confirm" class="px-6 pb-8 overflow-y-auto">
                 <div class="flex gap-4 mb-6">
                     <img src="{{ isset($book->gambar_buku[0]) ? $book->gambar_buku[0] : '' }}" class="w-24 h-24 rounded-xl object-cover shadow-md flex-shrink-0">
@@ -233,11 +225,13 @@
                     <button id="modal-action-btn" onclick="showSuccessState()" class="flex-1 py-3 bg-yellow-500 text-white rounded-full text-center font-bold text-sm shadow-lg">Sewa</button>
                 </div>
             </div>
+
+            <!-- STATE 2: SUCCESS -->
             <div id="modal-content-success" class="hidden px-6 pb-12 pt-4 flex-col items-center text-center h-[350px] justify-center">
                 <h2 class="text-3xl font-sugo text-blue-600 mb-2">Congratulations!</h2>
                 <p class="text-gray-500 text-sm mb-8">Your order has been Added to Cart.</p>
-                <div class="w-30 h-30 bg-transparent rounded-full flex items-center justify-center mb-10 animate-bounce">
-                    <img src="{{ asset('images/icon-check-green.png') }}" class="w-18 h-18">
+                <div class="w-24 h-24 bg-transparent rounded-full flex items-center justify-center mb-10 animate-bounce">
+                    <img src="{{ asset('images/icon-check-green.png') }}" class="w-24 h-24">
                 </div>
                 <a href="{{ route('cart.index') }}" class="w-full py-4 bg-blue-600 text-white rounded-full font-bold shadow-lg hover:bg-blue-700 transition-colors">Go To My Cart</a>
             </div>
@@ -255,20 +249,18 @@
 
 @push('scripts')
 <script>
-    // ... (Script Carousel & Modal sama seperti sebelumnya) ...
+    // ... (Carousel & Header Logic Tetap Sama) ...
     const items = document.querySelectorAll('.carousel-item');
     const nextBtn = document.getElementById('next-btn');
     const prevBtn = document.getElementById('prev-btn');
     let currentIndex = 0;
     const totalItems = items.length;
-
     function updateCarousel() {
         items.forEach((item, index) => {
             const blurLayer = item.querySelector('.blur-layer');
             item.classList.remove('z-20', 'z-10', 'scale-100', 'scale-90', 'translate-x-0', 'translate-x-[60%]', '-translate-x-[60%]');
             item.classList.add('hidden');
             if(blurLayer) blurLayer.classList.remove('opacity-0', 'opacity-100');
-
             if (index === currentIndex) {
                 item.classList.remove('hidden');
                 item.classList.add('z-20', 'scale-100', 'translate-x-0', 'w-[200px]', 'h-[300px]', 'left-1/2', '-ml-[100px]');
@@ -286,14 +278,10 @@
         if(totalItems > 1) { prevBtn.classList.remove('hidden'); nextBtn.classList.remove('hidden'); }
         else { prevBtn.classList.add('hidden'); nextBtn.classList.add('hidden'); }
     }
-
     items.forEach(item => item.classList.add('absolute', 'top-1/2', '-translate-y-1/2', 'rounded-xl', 'shadow-2xl'));
     updateCarousel();
-
     nextBtn.addEventListener('click', () => { currentIndex = (currentIndex + 1) % totalItems; updateCarousel(); });
     prevBtn.addEventListener('click', () => { currentIndex = (currentIndex - 1 + totalItems) % totalItems; updateCarousel(); });
-
-    // Sticky Header Logic
     const scrollContainer = document.getElementById('product-scroll-container');
     const header = document.getElementById('product-header');
     scrollContainer.addEventListener('scroll', () => {
@@ -312,7 +300,7 @@
         btn.style.display = 'none';
     }
 
-    // Modal logic... (copy-paste dari sebelumnya)
+    // --- Modal Logic ---
     const overlay = document.getElementById('modal-overlay');
     const sheet = document.getElementById('modal-sheet');
     const contentConfirm = document.getElementById('modal-content-confirm');
@@ -345,37 +333,44 @@
         if(currentMode === 'sewa') { actionBtn.className = "flex-1 py-3 bg-blue-400 text-white rounded-full text-center font-bold text-sm shadow-lg"; }
         else { actionBtn.className = "flex-1 py-3 bg-yellow-500 text-white rounded-full text-center font-bold text-sm shadow-lg"; }
     }
-    window.showSuccessState = function() {
-        // 1. Ambil data yang diperlukan
-        const bookId = {{ $book->id }};
-        const type = currentMode; // 'sewa' atau 'beli'
-        const qty = quantity;
 
-        // 2. Kirim Request AJAX ke Server
+    // --- FIX: AJAX Add to Cart & Update Badge ---
+    window.showSuccessState = function() {
+        const bookId = {{ $book->id }};
+
         fetch('{{ route("cart.add") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json' // Minta respons JSON
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 book_id: bookId,
-                type: type,
-                quantity: qty
+                type: currentMode,
+                quantity: quantity
             })
         })
-        .then(response => {
-            if (response.ok) {
-                // 3. Jika Sukses, Update UI Modal
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update UI Success
                 contentConfirm.classList.add('hidden');
                 contentSuccess.classList.remove('hidden');
                 contentSuccess.classList.add('flex');
 
-                // Optional: Update badge keranjang di header jika ada
-                // updateCartCount();
+                // Update Cart Badge Secara Realtime (Optional)
+                const badge = document.getElementById('cart-badge');
+                if (badge) {
+                    // Jika badge sudah ada, increment
+                    let count = parseInt(badge.innerText) || 0;
+                    badge.innerText = count + 1;
+                } else {
+                    // Jika belum ada, buat baru (logika DOM manipulation sederhana)
+                    // Untuk simplisitas, user akan melihat update saat reload/pindah halaman
+                }
             } else {
-                alert('Gagal menambahkan ke keranjang. Silakan coba lagi.');
+                alert('Gagal menambahkan ke keranjang.');
             }
         })
         .catch(error => {
@@ -383,6 +378,7 @@
             alert('Terjadi kesalahan jaringan.');
         });
     }
+
     overlay.addEventListener('click', closePurchaseModal);
 </script>
 @endpush
