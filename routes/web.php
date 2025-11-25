@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController; // <-- IMPORT BARU
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ProductController; // Import
 use App\Http\Controllers\CartController; // Import CartController
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +81,6 @@ Route::get('/notifications', function () {
     return view('placeholders.notifications');
 })->name('notifications.index')->middleware('auth');
 
-Route::get('/profile', function () {
-    return view('placeholders.profile');
-})->name('profile.index')->middleware('auth');
+Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index')->middleware('auth');
+Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('auth');
+Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update')->middleware('auth');
