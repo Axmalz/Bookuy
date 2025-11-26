@@ -1,59 +1,130 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Tentang Bookuy
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Bookuy adalah platform inovatif yang dirancang khusus untuk mahasiswa guna memfasilitasi jual-beli dan penyewaan buku bekas. Aplikasi ini bertujuan untuk membuat buku pelajaran lebih terjangkau dan mudah diakses, sekaligus mengurangi limbah kertas dengan mendorong penggunaan kembali buku.
 
-## About Laravel
+Kami percaya bahwa pendidikan harus dapat diakses oleh semua orang, dan Bookuy hadir untuk menjembatani kesenjangan antara mahasiswa yang membutuhkan buku dengan mereka yang memiliki buku yang tidak lagi digunakan.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Bookuy hadir dengan serangkaian fitur yang dirancang untuk memberikan pengalaman pengguna yang mulus dan intuitif:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Jual & Sewa Buku: Pengguna dapat memilih untuk membeli buku secara permanen atau menyewanya untuk jangka waktu tertentu (semester).
 
-## Learning Laravel
+- Pencarian & Filter Canggih: Temukan buku dengan cepat berdasarkan judul, penulis, atau kategori. Gunakan filter harga, kondisi, dan semester untuk hasil yang lebih spesifik.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- Desain Mobile-First: Antarmuka pengguna yang dioptimalkan untuk perangkat mobile, memberikan pengalaman seperti aplikasi native.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Sistem Rating & Review: Transparansi kualitas buku dan reputasi penjual melalui sistem ulasan yang komprehensif.
 
-## Laravel Sponsors
+- Keranjang Belanja: Kelola buku yang ingin dibeli atau disewa dalam satu tempat sebelum checkout.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Manajemen Profil: Atur informasi pribadi dan riwayat transaksi.
 
-### Premium Partners
+## Teknologi yang Digunakan
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Aplikasi ini dibangun menggunakan stack teknologi modern yang handal:
 
-## Contributing
+- Laravel 10: Framework PHP yang ekspresif dan elegan.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- MySQL: Sistem manajemen database relasional yang kuat.
 
-## Code of Conduct
+- Blade Templates: Mesin templating yang sederhana namun kuat.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Tailwind CSS: Framework CSS utility-first untuk desain UI yang cepat dan kustom.
 
-## Security Vulnerabilities
+## Panduan Instalasi
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lingkungan lokal Anda:
 
-## License
+### Prasyarat
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Pastikan Anda telah menginstal:
+
+PHP >= 8.1
+
+Composer
+
+Node.js & NPM (Opsional)
+
+MySQL
+
+### Langkah-langkah
+
+### 1. Clone Repositori:
+
+git clone [https://github.com/username/bookuy.git](https://github.com/username/bookuy.git)
+cd bookuy
+
+
+### 2. Instal Dependensi PHP:
+
+composer install
+
+
+### 3. Konfigurasi Environment:
+
+Salin file contoh .env dan sesuaikan dengan konfigurasi database Anda.
+
+cp .env.example .env
+
+
+Buka file .env dan atur kredensial database:
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bookuy_db
+DB_USERNAME=root
+DB_PASSWORD=
+
+
+### 4. Generate App Key:
+
+php artisan key:generate
+
+
+### 5. Migrasi Database & Seeding:
+
+Jalankan perintah ini untuk membuat tabel dan mengisi data dummy (termasuk 30 user random, buku, kategori, dan review).
+
+php artisan migrate:fresh --seed
+
+
+### 6. Jalankan Server:
+
+php artisan serve
+
+
+### 7. Akses Aplikasi:
+
+Buka browser Anda dan kunjungi http://localhost:8000.
+
+## Struktur Proyek
+
+Gambaran singkat struktur folder utama dalam proyek Bookuy:
+
+- app/Http/Controllers/: Logika aplikasi (AuthController, HomeController, ProductController, dll).
+
+- app/Models/: Definisi model Eloquent (User, Book, Category, Review, Cart).
+
+- database/migrations/: Skema database.
+
+    - database/seeders/: Data awal untuk pengujian.
+
+- resources/views/: Tampilan antarmuka pengguna (Blade templates).
+
+- public/images/: Aset gambar statis.
+
+## Kontributor
+
+Terima kasih kepada tim pengembang yang luar biasa:
+
+- James Melvin Chandra
+
+- Fadhiil Akmal Hamizan
+
+- Ananda Donelly Reksana
+
+- Hafiyyuddin Ahmad
+
+- Putu Arya Yubi Wirayudha
