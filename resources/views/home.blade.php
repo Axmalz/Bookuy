@@ -85,12 +85,21 @@
             </div>
         </div>
 
-        <!-- Popular -->
+        <!-- 8. Bagian Popular books -->
         <div class="mt-4">
             <h3 class="text-lg font-bold text-gray-900 mb-3">Popular books</h3>
             <div class="space-y-4 pb-4">
                 @foreach($popularBooks as $book)
-                <div class="w-full bg-white border border-gray-200 rounded-2xl p-3 flex flex-col gap-3 shadow-sm group hover:border-blue-300 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+
+                @php
+                    // Cek Stok Habis (Beli 0 DAN Sewa 0)
+                    $isOutOfStock = ($book->stok_beli <= 0 && $book->stok_sewa <= 0);
+                @endphp
+
+                <!-- Jika stok habis: bg-gray-100, grayscale, opacity rendah -->
+                <div class="w-full border border-gray-200 rounded-2xl p-3 flex flex-col gap-3 shadow-sm transition-all duration-300
+                            {{ $isOutOfStock ? 'bg-gray-100 opacity-75 grayscale' : 'bg-white group hover:border-blue-300 hover:shadow-md hover:-translate-y-1' }}">
+
                     <div class="flex gap-3">
                         <a href="{{ route('product.show', $book->id) }}" class="flex-shrink-0 w-20 h-28 overflow-hidden rounded-lg relative">
                             <div class="w-full h-full bg-gray-200">
@@ -124,9 +133,16 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('product.show', $book->id) }}" class="block w-full bg-yellow-400 text-yellow-900 text-xs font-bold uppercase tracking-wide py-2.5 rounded-full text-center hover:bg-yellow-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-200">
-                        Grab Now
-                    </a>
+                    <!-- Tombol Grab Now / Out of Stock -->
+                    @if($isOutOfStock)
+                        <button disabled class="block w-full bg-gray-400 text-white text-xs font-bold uppercase tracking-wide py-2.5 rounded-full text-center cursor-not-allowed">
+                            Out of Stock
+                        </button>
+                    @else
+                        <a href="{{ route('product.show', $book->id) }}" class="block w-full bg-yellow-400 text-yellow-900 text-xs font-bold uppercase tracking-wide py-2.5 rounded-full text-center hover:bg-yellow-500 hover:shadow-lg hover:scale-[1.02] transition-all duration-200">
+                            Grab Now
+                        </a>
+                    @endif
                 </div>
                 @endforeach
             </div>

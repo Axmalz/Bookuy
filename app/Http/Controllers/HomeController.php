@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Book;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -12,17 +13,19 @@ class HomeController extends Controller
     {
         $categories = Category::all();
 
-        // Mengambil buku dengan rata-rata rating (reviews_avg_rating)
-        // dan jumlah review (reviews_count)
+        // Recommended
         $recommendedBooks = Book::withAvg('reviews', 'rating')
                                 ->withCount('reviews')
+                                ->orderByStockAvailability() // FIX: Panggil Scope DI SINI (sebelum get)
                                 ->latest()
                                 ->take(5)
                                 ->get();
 
+        // Popular
         $popularBooks = Book::withAvg('reviews', 'rating')
                             ->withCount('reviews')
-                            ->orderByDesc('reviews_avg_rating') // Urutkan dari rating tertinggi
+                            ->orderByStockAvailability() // FIX: Panggil Scope DI SINI (sebelum get)
+                            ->orderByDesc('reviews_avg_rating')
                             ->take(5)
                             ->get();
 

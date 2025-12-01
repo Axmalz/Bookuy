@@ -21,42 +21,48 @@
         <!-- Logo Tengah -->
         <img src="{{ asset('images/icon-bookuy-logo-white.png') }}" alt="Bookuy" class="h-16 w-auto drop-shadow-md pointer-events-auto">
 
-        <!-- Tombol Keranjang (FIXED BADGE) -->
-        <a href="{{ route('cart.index') }}" class="text-white drop-shadow-md relative hover:text-gray-200 transition-colors pointer-events-auto">
-            <img src="{{ asset('images/icon-cart-white.png') }}" alt="Cart" class="w-7 h-7">
-
-            <!-- Badge Indikator Dinamis -->
-            @if($cartCount > 0)
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transform scale-100 transition-transform duration-200" id="cart-badge">
-                {{ $cartCount }}
-            </span>
-            @endif
-        </a>
+        <!-- Kanan: Edit Button (Jika Penjual) ATAU Cart (Jika Pembeli) -->
+        @if(Auth::check() && Auth::id() == $book->user_id)
+            <!-- TOMBOL EDIT PRODUK (Hanya untuk Penjual) -->
+            <a href="{{ route('product.edit', $book->id) }}" class="w-9 h-9 bg-yellow-500 rounded-full flex items-center justify-center shadow-lg pointer-events-auto hover:bg-yellow-600 transition-colors">
+                <!-- Icon Pencil SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="white" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                </svg>
+            </a>
+        @else
+            <!-- Tombol Keranjang (Untuk Pembeli) -->
+            <a href="{{ route('cart.index') }}" class="text-white drop-shadow-md relative hover:text-gray-200 transition-colors pointer-events-auto">
+                <img src="{{ asset('images/icon-cart-white.png') }}" alt="Cart" class="w-7 h-7">
+                @if($cartCount > 0)
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transform scale-100 transition-transform duration-200" id="cart-badge">
+                    {{ $cartCount }}
+                </span>
+                @endif
+            </a>
+        @endif
     </div>
 
-    <!-- ... (Sisa Konten Detail Produk Tetap Sama) ... -->
-
+    <!-- ... (SISA KODE SAMA) ... -->
     <!-- 2. Konten Scrollable -->
     <div id="product-scroll-container" class="flex-grow overflow-y-auto pb-[140px] no-scrollbar bg-white relative z-0">
+        <!-- ... (Carousel, Info Buku, dll TETAP SAMA) ... -->
         <!-- Bagian Atas: Carousel -->
         <div class="relative w-full bg-blue-600 rounded-b-[50px] pb-10 pt-28 overflow-hidden shadow-xl z-10">
             <div id="carousel-container" class="relative w-full h-[380px] flex items-center justify-center perspective-1000">
                 <button id="prev-btn" class="absolute left-4 z-30 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg {{ count($book->gambar_buku) <= 1 ? 'hidden' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="white" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
                 </button>
-
                 @foreach($book->gambar_buku as $index => $img)
                 <div class="carousel-item absolute transition-all duration-500 ease-out shadow-2xl rounded-lg overflow-hidden bg-gray-200" data-index="{{ $index }}">
                     <img src="{{ $img }}" class="w-full h-full object-cover">
                     <div class="blur-layer absolute inset-0 bg-white/30 backdrop-blur-[2px] opacity-0 transition-opacity duration-500"></div>
                 </div>
                 @endforeach
-
                 <button id="next-btn" class="absolute right-4 z-30 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg {{ count($book->gambar_buku) <= 1 ? 'hidden' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="white" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                 </button>
             </div>
-
             <div class="px-8 mt-6 text-left text-white">
                 <h1 class="font-sugo text-3xl tracking-wide leading-tight">{{ $book->judul_buku }}</h1>
                 <p class="font-poppins text-sm text-blue-100 mt-1">{{ $book->nama_penulis }}</p>
@@ -70,6 +76,7 @@
                 <p class="text-gray-500 text-sm leading-relaxed text-justify">{{ $book->deskripsi_buku }}</p>
             </div>
 
+            <!-- Detail Info -->
             <div class="grid grid-cols-2 gap-y-4 text-sm">
                 <div class="text-gray-900 font-bold">Alamat</div>
                 <div class="text-gray-500 text-right">{{ $book->alamat_buku }}</div>
@@ -79,20 +86,36 @@
                 <div class="text-gray-500 text-right">{{ $book->category->name }}</div>
                 <div class="text-gray-900 font-bold">Halaman</div>
                 <div class="text-gray-500 text-right">{{ $book->jumlah_halaman }}</div>
-            </div>
 
+                <!-- NEW: Info Stok -->
+                <div class="text-gray-900 font-bold">Stok Beli</div>
+                <div class="text-gray-500 text-right font-bold {{ $book->stok_beli > 0 ? 'text-green-600' : 'text-red-500' }}">
+                    {{ $book->stok_beli > 0 ? $book->stok_beli . ' Pcs' : 'Habis' }}
+                </div>
+                <div class="text-gray-900 font-bold">Stok Sewa</div>
+                <div class="text-gray-500 text-right font-bold {{ $book->stok_sewa > 0 ? 'text-green-600' : 'text-red-500' }}">
+                    {{ $book->stok_sewa > 0 ? $book->stok_sewa . ' Pcs' : 'Habis' }}
+                </div>
+            </div>
             <div class="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
                 <div class="w-12 h-12 rounded-full bg-gray-300 overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($book->user->name) }}&background=random" class="w-full h-full object-cover">
+                    @if($book->user->profile_photo_path)
+                        <img src="{{ asset('storage/' . $book->user->profile_photo_path) }}" class="w-full h-full object-cover">
+                    @else
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($book->user->name) }}&background=random" class="w-full h-full object-cover">
+                    @endif
                 </div>
                 <div>
                     <p class="text-xs text-gray-400">Penjual</p>
                     <h4 class="font-bold text-gray-900">{{ $book->user->name }}</h4>
-                    <p class="text-xs text-gray-500">Mahasiswa Semester {{ rand(1, 8) }}</p>
+                    @if($book->user->semester && $book->user->semester !== 'Tidak ada')
+                        <p class="text-xs text-gray-500">Mahasiswa Semester {{ $book->user->semester }}</p>
+                    @endif
                 </div>
             </div>
 
-            <div>
+            <!-- Rating & Reviews Sections... (sama) -->
+             <div>
                 <div class="flex items-end gap-2 mb-4">
                     <span class="text-5xl font-bold text-gray-900">{{ number_format($averageRating, 1) }}</span>
                     <div class="mb-2">
@@ -129,7 +152,6 @@
                             <option value="newest" {{ $currentSort == 'newest' ? 'selected' : '' }}>Terbaru</option>
                         </select>
                     </div>
-
                     <div class="space-y-6">
                         @foreach($reviews as $review)
                         <div class="border-b border-gray-100 pb-4 last:border-0">
@@ -155,7 +177,6 @@
                         </div>
                         @endforeach
                     </div>
-
                     <div class="flex justify-center mt-6">
                          <select name="review_limit" onchange="this.form.submit()" class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 focus:ring-0 cursor-pointer shadow-sm">
                             <option value="5" {{ $currentLimit == '5' ? 'selected' : '' }}>Show 5</option>
@@ -174,14 +195,32 @@
         <button class="w-12 h-12 bg-blue-800 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-900 transition-colors">
             <img src="{{ asset('images/icon-chat-blue.png') }}" class="w-6 h-6 filter brightness-0 invert">
         </button>
-        <button onclick="openPurchaseModal('sewa')" class="flex-grow ml-4 h-12 bg-blue-400 rounded-full flex flex-col items-center justify-center text-white shadow-lg hover:bg-blue-500 transition-colors">
-            <span class="text-sm font-bold leading-none">Sewa</span>
-            <span class="text-[10px] opacity-90">Rp {{ number_format($book->harga_sewa, 0, ',', '.') }}</span>
-        </button>
-        <button onclick="openPurchaseModal('beli')" class="flex-grow ml-3 h-12 bg-yellow-500 rounded-full flex flex-col items-center justify-center text-white shadow-lg hover:bg-yellow-600 transition-colors">
-            <span class="text-sm font-bold leading-none">Beli</span>
-            <span class="text-[10px] opacity-90">Rp {{ number_format($book->harga_beli, 0, ',', '.') }}</span>
-        </button>
+
+        <!-- Tombol Sewa (Disable jika stok sewa 0) -->
+        @if($book->stok_sewa > 0)
+            <button onclick="openPurchaseModal('sewa')" class="flex-grow ml-4 h-12 bg-blue-400 rounded-full flex flex-col items-center justify-center text-white shadow-lg hover:bg-blue-500 transition-colors">
+                <span class="text-sm font-bold leading-none">Sewa</span>
+                <span class="text-[10px] opacity-90">Rp {{ number_format($book->harga_sewa, 0, ',', '.') }}</span>
+            </button>
+        @else
+            <button disabled class="flex-grow ml-4 h-12 bg-gray-400/50 rounded-full flex flex-col items-center justify-center text-white/70 shadow-none cursor-not-allowed border border-white/20">
+                <span class="text-sm font-bold leading-none">Stok Habis</span>
+                <span class="text-[10px]">Sewa</span>
+            </button>
+        @endif
+
+        <!-- Tombol Beli (Disable jika stok beli 0) -->
+        @if($book->stok_beli > 0)
+            <button onclick="openPurchaseModal('beli')" class="flex-grow ml-3 h-12 bg-yellow-500 rounded-full flex flex-col items-center justify-center text-white shadow-lg hover:bg-yellow-600 transition-colors">
+                <span class="text-sm font-bold leading-none">Beli</span>
+                <span class="text-[10px] opacity-90">Rp {{ number_format($book->harga_beli, 0, ',', '.') }}</span>
+            </button>
+        @else
+            <button disabled class="flex-grow ml-3 h-12 bg-gray-400/50 rounded-full flex flex-col items-center justify-center text-white/70 shadow-none cursor-not-allowed border border-white/20">
+                <span class="text-sm font-bold leading-none">Stok Habis</span>
+                <span class="text-[10px]">Beli</span>
+            </button>
+        @endif
     </div>
 
     <!-- PURCHASE POPUP -->
@@ -194,8 +233,6 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-
-            <!-- STATE 1: CONFIRM -->
             <div id="modal-content-confirm" class="px-6 pb-8 overflow-y-auto">
                 <div class="flex gap-4 mb-6">
                     <img src="{{ isset($book->gambar_buku[0]) ? $book->gambar_buku[0] : '' }}" class="w-24 h-24 rounded-xl object-cover shadow-md flex-shrink-0">
@@ -225,8 +262,6 @@
                     <button id="modal-action-btn" onclick="showSuccessState()" class="flex-1 py-3 bg-yellow-500 text-white rounded-full text-center font-bold text-sm shadow-lg">Sewa</button>
                 </div>
             </div>
-
-            <!-- STATE 2: SUCCESS -->
             <div id="modal-content-success" class="hidden px-6 pb-12 pt-4 flex-col items-center text-center h-[350px] justify-center">
                 <h2 class="text-3xl font-sugo text-blue-600 mb-2">Congratulations!</h2>
                 <p class="text-gray-500 text-sm mb-8">Your order has been Added to Cart.</p>
@@ -249,7 +284,8 @@
 
 @push('scripts')
 <script>
-    // ... (Carousel & Header Logic Tetap Sama) ...
+    // Scripts JS sama persis dengan sebelumnya (Carousel, Sticky Header, Modal, dll)
+
     const items = document.querySelectorAll('.carousel-item');
     const nextBtn = document.getElementById('next-btn');
     const prevBtn = document.getElementById('prev-btn');
@@ -282,6 +318,7 @@
     updateCarousel();
     nextBtn.addEventListener('click', () => { currentIndex = (currentIndex + 1) % totalItems; updateCarousel(); });
     prevBtn.addEventListener('click', () => { currentIndex = (currentIndex - 1 + totalItems) % totalItems; updateCarousel(); });
+
     const scrollContainer = document.getElementById('product-scroll-container');
     const header = document.getElementById('product-header');
     scrollContainer.addEventListener('scroll', () => {
@@ -299,17 +336,16 @@
         parent.querySelector('.full-text').classList.toggle('hidden');
         btn.style.display = 'none';
     }
-
-    // --- Modal Logic ---
     const overlay = document.getElementById('modal-overlay');
     const sheet = document.getElementById('modal-sheet');
     const contentConfirm = document.getElementById('modal-content-confirm');
     const contentSuccess = document.getElementById('modal-content-success');
+    const stockBeli = {{ $book->stok_beli }};
+    const stockSewa = {{ $book->stok_sewa }};
     const hargaSewa = {{ $book->harga_sewa }};
     const hargaBeli = {{ $book->harga_beli }};
     let currentMode = 'sewa';
     let quantity = 1;
-
     window.openPurchaseModal = function(mode) {
         currentMode = mode; quantity = 1;
         contentConfirm.classList.remove('hidden'); contentSuccess.classList.add('hidden'); contentSuccess.classList.remove('flex');
@@ -318,8 +354,23 @@
     }
     window.closePurchaseModal = function() { sheet.classList.add('translate-y-full'); overlay.classList.add('opacity-0'); setTimeout(() => overlay.classList.add('hidden'), 300); }
     window.updateQuantity = function(change) {
-        let newQty = quantity + change; let max = (currentMode === 'sewa') ? 8 : 5;
-        if (newQty >= 1 && newQty <= max) { quantity = newQty; updateModalUI(); }
+        let newQty = quantity + change;
+
+        // Logika Batas Max
+        let max = 1;
+        if (currentMode === 'sewa') {
+            max = 8;
+        } else {
+            // Beli max sesuai stok yang tersedia
+            max = stockBeli;
+        }
+
+        if (newQty >= 1 && newQty <= max) {
+            quantity = newQty;
+            updateModalUI();
+        }
+        // DIHAPUS: else if (newQty > max ...) { alert(...) }
+        // Tombol plus cukup tidak merespon jika sudah max
     }
     function updateModalUI() {
         const priceEl = document.getElementById('modal-price');
@@ -333,44 +384,83 @@
         if(currentMode === 'sewa') { actionBtn.className = "flex-1 py-3 bg-blue-400 text-white rounded-full text-center font-bold text-sm shadow-lg"; }
         else { actionBtn.className = "flex-1 py-3 bg-yellow-500 text-white rounded-full text-center font-bold text-sm shadow-lg"; }
     }
-
-    // --- FIX: AJAX Add to Cart & Update Badge ---
     window.showSuccessState = function() {
         const bookId = {{ $book->id }};
 
         fetch('{{ route("cart.add") }}', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                book_id: bookId,
-                type: currentMode,
-                quantity: quantity
-            })
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+            body: JSON.stringify({ book_id: bookId, type: currentMode, quantity: quantity })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update UI Success
+                // ... (Tampilkan sukses) ...
                 contentConfirm.classList.add('hidden');
                 contentSuccess.classList.remove('hidden');
                 contentSuccess.classList.add('flex');
+            }
+        })
+        .catch(error => {
+             // Error Handling khusus untuk stok habis
+             // Karena fetch tidak otomatis throw error pada 400/500, kita harus cek response.ok sebenarnya.
+             // Tapi karena saya pakai catch global di sini, mari kita asumsikan controller kirim status 400
+             // Kita perlu parsing error message dari response json jika memungkinkan.
+        });
 
-                // Update Cart Badge Secara Realtime (Optional)
-                const badge = document.getElementById('cart-badge');
-                if (badge) {
-                    // Jika badge sudah ada, increment
-                    let count = parseInt(badge.innerText) || 0;
-                    badge.innerText = count + 1;
+        // REVISI FETCH untuk menangani error response dengan benar:
+        /*
+        fetch(...)
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) {
+                // Jika error (misal stok habis)
+                if (data.message === 'Books ordered exceed stock!') {
+                    alert(data.message);
+                    window.location.reload(); // Refresh halaman agar stok terupdate
                 } else {
-                    // Jika belum ada, buat baru (logika DOM manipulation sederhana)
-                    // Untuk simplisitas, user akan melihat update saat reload/pindah halaman
+                    alert(data.message || 'Gagal menambahkan.');
                 }
-            } else {
-                alert('Gagal menambahkan ke keranjang.');
+                return;
+            }
+            // Jika sukses...
+        })
+        */
+    }
+
+    // Saya tulis ulang fungsi showSuccessState yang benar di bawah:
+    window.showSuccessState = function() {
+        const bookId = {{ $book->id }};
+
+        fetch('{{ route("cart.add") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+            body: JSON.stringify({ book_id: bookId, type: currentMode, quantity: quantity })
+        })
+        .then(async response => {
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Handle Error Stok Habis
+                if (data.message && data.message.includes('stock')) {
+                    alert('Books ordered exceed stock!');
+                    window.location.reload(); // Refresh halaman detail produk
+                } else {
+                    alert('Error: ' + (data.message || 'Something went wrong'));
+                }
+                return;
+            }
+
+            // Sukses
+            contentConfirm.classList.add('hidden');
+            contentSuccess.classList.remove('hidden');
+            contentSuccess.classList.add('flex');
+
+            // Update badge
+            const badge = document.getElementById('cart-badge');
+            if (badge) {
+                let count = parseInt(badge.innerText) || 0;
+                badge.innerText = count + 1;
             }
         })
         .catch(error => {
@@ -378,7 +468,5 @@
             alert('Terjadi kesalahan jaringan.');
         });
     }
-
-    overlay.addEventListener('click', closePurchaseModal);
 </script>
 @endpush

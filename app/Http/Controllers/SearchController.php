@@ -14,8 +14,8 @@ class SearchController extends Controller
         $categories = Category::all();
         $query = $request->input('q');
         $categoryFilter = $request->input('category');
+        $sellerId = $request->input('seller');
 
-        // Filter parameter
         $sort = $request->input('sort', 'relevance');
         $minPrice = $request->input('min_price', 0);
         $maxPrice = $request->input('max_price', 200000);
@@ -24,27 +24,28 @@ class SearchController extends Controller
 
         $books = null;
 
-        // Cek apakah ada pencarian aktif
-        if ($query || $categoryFilter || $request->has('sort') || $request->has('min_price')) {
+        if ($query || $categoryFilter || $sellerId || $request->has('sort') || $request->has('min_price')) {
 
             $books = Book::withAvg('reviews', 'rating')
-                         ->withCount('reviews');
+                         ->withCount('reviews')
+                         ->orderByStockAvailability(); // FIX: Pastikan stok habis ada di bawah
+
+            if ($sellerId) {
+                $books->where('user_id', $sellerId);
+            }
 
             if ($query) {
                 $books->where(function ($q) use ($query) {
                     $q->where('judul_buku', 'like', "%{$query}%")
                       ->orWhere('nama_penulis', 'like', "%{$query}%");
                 });
-                // SIMPAN PENCARIAN KE SESSION
-                $this->addToRecentSearches($query);
+                if (!$sellerId) $this->addToRecentSearches($query);
             }
 
             if ($categoryFilter) {
                 $books->whereHas('category', function ($q) use ($categoryFilter) {
                     $q->where('name', $categoryFilter);
                 });
-                // Opsional: Simpan kategori juga jika diinginkan sebagai recent search
-                // $this->addToRecentSearches($categoryFilter);
             }
 
             $books->whereBetween('harga_beli', [$minPrice, $maxPrice]);
@@ -57,7 +58,6 @@ class SearchController extends Controller
                 $books->where('kondisi_buku', strtolower($condition));
             }
 
-            // Logika Sorting
             if ($sort && $sort !== 'relevance') {
                 $sorts = explode(',', $sort);
                 foreach ($sorts as $s) {
@@ -73,8 +73,6 @@ class SearchController extends Controller
             $books = $books->get();
         }
 
-        // AMBIL RECENT SEARCHES DARI SESSION
-        // Pastikan session key konsisten ('recent_searches')
         $recentSearches = Session::get('recent_searches', []);
 
         return view('search.index', [
@@ -93,47 +91,22 @@ class SearchController extends Controller
         ]);
     }
 
-    // Fungsi helper untuk menyimpan pencarian
-    private function addToRecentSearches($query)
-    {
-        if (empty($query)) return; // Jangan simpan string kosong
-
+    private function addToRecentSearches($query) {
+        if (empty($query)) return;
         $recent = Session::get('recent_searches', []);
-
-        // Hapus jika sudah ada (agar tidak duplikat dan naik ke paling atas)
-        if (($key = array_search($query, $recent)) !== false) {
-            unset($recent[$key]);
-        }
-
-        // Tambahkan ke awal array
+        if (($key = array_search($query, $recent)) !== false) unset($recent[$key]);
         array_unshift($recent, $query);
-
-        // Batasi hanya simpan 5 pencarian terakhir
-        $recent = array_slice($recent, 0, 5);
-
-        // Simpan kembali ke session
-        Session::put('recent_searches', array_values($recent));
-        Session::save(); // Paksa simpan session
-    }
-
-    public function clearRecent()
-    {
-        Session::forget('recent_searches');
+        Session::put('recent_searches', array_slice($recent, 0, 5));
         Session::save();
-        return redirect()->route('search.index');
     }
-
-    public function removeRecent(Request $request)
-    {
+    public function clearRecent() { Session::forget('recent_searches'); return redirect()->route('search.index'); }
+    public function removeRecent(Request $request) {
         $queryToRemove = $request->input('q');
         $recent = Session::get('recent_searches', []);
-
         if (($key = array_search($queryToRemove, $recent)) !== false) {
             unset($recent[$key]);
             Session::put('recent_searches', array_values($recent));
-            Session::save();
         }
-
         return redirect()->route('search.index');
     }
 }

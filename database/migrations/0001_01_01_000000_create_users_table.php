@@ -17,6 +17,14 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // == KOLOM TAMBAHAN PROFIL (DIPINDAHKAN KE SINI) ==
+            $table->string('profile_photo_path')->nullable();
+            $table->enum('gender', ['Male', 'Female', 'Prefer not to say'])->nullable();
+            $table->string('semester')->nullable(); // String agar bisa simpan "Tidak ada"
+            $table->text('description')->nullable();
+            // ================================================
+
             $table->rememberToken();
             $table->timestamps();
         });

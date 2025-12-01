@@ -65,9 +65,6 @@ Route::get('/search', [SearchController::class, 'index'])->name('search.index')-
 Route::post('/search/clear', [SearchController::class, 'clearRecent'])->name('search.clear')->middleware('auth');
 Route::post('/search/remove', [SearchController::class, 'removeRecent'])->name('search.remove')->middleware('auth');
 
-// /product/{id} (dari buku)
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show')->middleware('auth');
-
 // --- Rute Nav Bar ---
 Route::get('/chat', function () {
     return view('placeholders.chat');
@@ -84,3 +81,15 @@ Route::get('/notifications', function () {
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index')->middleware('auth');
 Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('auth');
 Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update')->middleware('auth');
+Route::get('/profile/sales-history', [ProfileController::class, 'salesHistory'])->name('profile.sales_history')->middleware('auth');
+
+// Product Create (Jual Buku)
+Route::get('/sell', [ProductController::class, 'create'])->name('product.create')->middleware('auth');
+Route::post('/sell', [ProductController::class, 'store'])->name('product.store')->middleware('auth');
+
+// Product Detail
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show')->middleware('auth');
+
+// Product Edit & Update (BARU)
+Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit')->middleware('auth');
+Route::post('/product/{id}/update', [ProductController::class, 'update'])->name('product.update')->middleware('auth');

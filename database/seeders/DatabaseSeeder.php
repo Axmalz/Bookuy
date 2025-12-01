@@ -7,27 +7,24 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // 1. Buat User Admin (Fadhiil) jika belum ada
+        // 1. Buat User Admin
         if (User::count() == 0) {
             User::factory()->create([
-            'name' => 'Fadhiil',
-            'email' => 'fadhiil@example.com'
+                'name' => 'Fadhiil',
+                'email' => 'fadhiil@example.com',
             ]);
         }
 
-        // 2. Buat 30 User Tambahan (Penjual & Reviewer)
-        User::factory(30)->create();
+        // 2. Buat User Lain
+        User::factory(100)->create();
 
-        // 3. Panggil Seeder Lain (Kategori & Buku)
-        // Seeder Buku akan menggunakan user-user yang baru saja dibuat di atas
+        // 3. Panggil Seeder
         $this->call([
             CategorySeeder::class,
             BookSeeder::class,
+            OrderSeeder::class, // <-- PASTIKAN INI ADA
         ]);
     }
 }

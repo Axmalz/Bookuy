@@ -113,7 +113,7 @@
             <a href="{{ route('chat.index') }}" class="nav-item {{ $currentRoute == 'chat.index' ? 'active' : '' }}">
                 <img src="{{ asset('images/nav-chat.png') }}" alt="Chat">
             </a>
-            <a href="{{ route('create.index') }}" class="nav-item {{ $currentRoute == 'create.index' ? 'active' : '' }}">
+            <a href="{{ route('product.create') }}" class="nav-item {{ $currentRoute == 'product.create' ? 'active' : '' }}">
                 <img src="{{ asset('images/nav-create.png') }}" alt="Create">
             </a>
             <a href="{{ route('notifications.index') }}" class="nav-item {{ $currentRoute == 'notifications.index' ? 'active' : '' }}">

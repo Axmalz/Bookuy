@@ -15,11 +15,11 @@ return new class extends Migration
             $table->decimal('harga_beli', 10, 2);
             $table->decimal('harga_sewa', 10, 2);
 
-            // Kita hapus kolom static average_rating/jumlah_review
-            // karena kita akan menghitungnya secara dinamis dari relasi reviews
-            // agar data SELALU konsisten.
+            // Stok
+            $table->integer('stok_beli')->default(0);
+            $table->integer('stok_sewa')->default(0);
 
-            $table->text('gambar_buku'); // Menggunakan TEXT untuk menyimpan JSON Array
+            $table->text('gambar_buku'); // JSON Array
             $table->text('deskripsi_buku');
             $table->foreignId('user_id')->constrained('users');
             $table->enum('kondisi_buku', ['baru', 'bekas premium', 'bekas usang']);
