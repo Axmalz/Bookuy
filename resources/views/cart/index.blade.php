@@ -5,27 +5,19 @@
 
     <!-- 1. Header Biru (Fixed) -->
     <div class="w-full bg-blue-600 pt-14 pb-5 rounded-b-[30px] shadow-md z-20 relative px-6 flex-shrink-0">
-        <!-- ... (Header sama) ... -->
         <div class="relative flex flex-col items-center justify-center mb-5">
-            <a href="{{ route('home') }}" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
+            <a href="{{ $backUrl }}" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
             </a>
+            <img src="{{ asset('images/icon-bookuy-logo-white.png') }}" alt="Bookuy" class="h-16 w-auto mb-1 drop-shadow-sm">
             <h1 class="font-sugo text-3xl text-white tracking-wide">Keranjang</h1>
         </div>
 
         <div class="bg-white p-1 rounded-full flex shadow-inner">
-            <a href="{{ route('cart.index', ['tab' => 'beli']) }}"
-               class="flex-1 py-2 rounded-full text-center text-sm font-bold transition-all duration-300
-                      {{ $activeTab == 'beli' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:bg-gray-100' }}">
-                Beli
-            </a>
-            <a href="{{ route('cart.index', ['tab' => 'sewa']) }}"
-               class="flex-1 py-2 rounded-full text-center text-sm font-bold transition-all duration-300
-                      {{ $activeTab == 'sewa' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:bg-gray-100' }}">
-                Sewa
-            </a>
+            <a href="{{ route('cart.index', ['tab' => 'beli']) }}" class="flex-1 py-2 rounded-full text-center text-sm font-bold transition-all duration-300 {{ $activeTab == 'beli' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:bg-gray-100' }}">Beli</a>
+            <a href="{{ route('cart.index', ['tab' => 'sewa']) }}" class="flex-1 py-2 rounded-full text-center text-sm font-bold transition-all duration-300 {{ $activeTab == 'sewa' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:bg-gray-100' }}">Sewa</a>
         </div>
     </div>
 
@@ -34,12 +26,11 @@
         @if($items->count() > 0)
             <div class="space-y-4">
                 @foreach($items as $item)
-                <div class="border rounded-2xl p-4 shadow-sm flex gap-3 items-start relative group transition-all duration-300
-                            {{ $item->is_selected ? 'border-blue-500 bg-blue-50/20 ring-1 ring-blue-500' : 'border-gray-100 bg-white hover:border-blue-200' }}">
+                <div class="border rounded-2xl p-4 shadow-sm flex gap-3 items-start relative group transition-all duration-300 {{ $item->is_selected ? 'border-blue-500 bg-blue-50/20 ring-1 ring-blue-500' : 'border-gray-100 bg-white hover:border-blue-200' }}">
 
-                    <!-- Checkbox -->
-                    <div class="flex items-center h-full pt-8 flex-shrink-0">
-                        <button onclick="toggleSelection({{ $item->id }})" class="focus:outline-none transform active:scale-90 transition-transform">
+                    <!-- Checkbox (Z-Index tinggi agar bisa diklik) -->
+                    <div class="flex items-center h-full pt-8 flex-shrink-0 relative z-10">
+                        <button onclick="toggleSelection({{ $item->id }}, {{ $item->is_selected ? 'true' : 'false' }})" class="focus:outline-none transform active:scale-90 transition-transform">
                             <img src="{{ $item->is_selected ? asset('images/icon-check-blue.png') : asset('images/icon-uncheck-grey.png') }}" class="w-6 h-6">
                         </button>
                     </div>
@@ -49,7 +40,7 @@
                          <img src="{{ isset($item->book->gambar_buku[0]) ? $item->book->gambar_buku[0] : '' }}" class="w-full h-full object-cover absolute inset-0">
                     </div>
 
-                    <!-- Detail -->
+                    <!-- Detail Info -->
                     <div class="flex-grow min-w-0 flex flex-col h-full justify-between w-full relative">
                         <div class="flex justify-between items-start mb-2">
                             <div class="pr-8 min-w-0 w-full">
@@ -57,34 +48,52 @@
                                 <p class="text-xs text-gray-400 mt-0.5 capitalize truncate">{{ $item->book->kondisi_buku }}</p>
                             </div>
 
-                            <!-- Tombol Hapus (FIXED: Form submit yang benar) -->
-                            <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="absolute -top-1 -right-1 z-10">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="p-2 opacity-60 hover:opacity-100 transition-opacity">
+                            <!-- Tombol Hapus (Z-Index tinggi) -->
+                            <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="absolute -top-1 -right-1 z-20">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="p-2 opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
                                     <img src="{{ asset('images/icon-trash-red.png') }}" class="w-4 h-4">
                                 </button>
                             </form>
                         </div>
 
-                        <div class="flex justify-between items-end mt-auto gap-2">
+                        <div class="flex justify-between items-end mt-auto gap-2 flex-wrap sm:flex-nowrap">
                             <div class="text-blue-600 font-bold text-sm whitespace-nowrap mb-1">
                                 Rp {{ number_format(($item->type == 'sewa' ? $item->book->harga_sewa : $item->book->harga_beli) * $item->quantity, 0, ',', '.') }}
                             </div>
 
-                            <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-2 py-1 border border-gray-100 flex-shrink-0 ml-auto shadow-sm">
+                            <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-2 py-1 border border-gray-100 flex-shrink-0 ml-auto shadow-sm relative z-10">
                                 @if($item->type == 'beli')
-                                    <!-- Tombol Minus -->
-                                    <button onclick="updateQty({{ $item->id }}, -1)" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors active:scale-90">
+                                    <!--
+                                        LOGIKA STOK BELI:
+                                        Max Qty = Qty di Keranjang + Sisa Stok di Gudang
+                                    -->
+                                    @php
+                                        $maxStock = $item->quantity + $item->book->stok_beli;
+                                    @endphp
+
+                                    <button onclick="updateQty({{ $item->id }}, -1, {{ $maxStock }})" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors active:scale-90">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" /></svg>
                                     </button>
+
                                     <span id="qty-text-{{ $item->id }}" class="text-xs font-bold text-gray-700 w-5 text-center select-none">{{ $item->quantity }}</span>
-                                    <!-- Tombol Plus -->
-                                    <button onclick="updateQty({{ $item->id }}, 1)" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors active:scale-90">
+
+                                    <!-- Tombol Plus: Disable visual jika qty >= maxStock -->
+                                    <button onclick="updateQty({{ $item->id }}, 1, {{ $maxStock }})" class="w-6 h-6 flex items-center justify-center {{ $item->quantity >= $maxStock ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-blue-600 active:scale-90' }} transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                                     </button>
                                 @else
-                                    <span class="text-xs font-bold text-gray-600 px-2 whitespace-nowrap">{{ $item->quantity }} Semester</span>
+                                    <!-- LOGIKA SEWA: Max 8 Semester -->
+                                    @php $maxSem = 8; @endphp
+                                    <button onclick="updateQty({{ $item->id }}, -1, {{ $maxSem }})" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors active:scale-90">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" /></svg>
+                                    </button>
+
+                                    <span class="text-xs font-bold text-gray-600 px-2 whitespace-nowrap select-none">{{ $item->quantity }} Semester</span>
+
+                                    <button onclick="updateQty({{ $item->id }}, 1, {{ $maxSem }})" class="w-6 h-6 flex items-center justify-center {{ $item->quantity >= $maxSem ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-blue-600 active:scale-90' }} transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                    </button>
                                 @endif
                             </div>
                         </div>
@@ -151,42 +160,68 @@
 
 @push('scripts')
 <script>
-    // Toggle Checkbox
-    function toggleSelection(itemId) {
+    // Fungsi Toggle Checkbox
+    function toggleSelection(itemId, currentState) {
         fetch(`{{ url('/cart/update') }}/${itemId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
             body: JSON.stringify({
-                // Kita tidak perlu kirim status sekarang, server cukup tau ini toggle, atau kita bisa kirim nilai baru
-                // Untuk keamanan data yang konsisten, mari kita minta server untuk toggle nilainya.
-                // Namun di controller saya menulis logic menerima nilai, jadi kita bisa ambil state visual saat ini dan membalikkannya.
-                // Tapi lebih aman ambil dari server. Untuk simplisitas UI, kita asumsikan toggle di controller atau kirim kebalikan.
-                // Di controller, saya implementasikan "if has is_selected set it".
-                // Mari kita ambil status dari UI gambar:
-                is_selected: !document.getElementById('check-img-' + itemId).src.includes('check-blue')
+                is_selected: !currentState // Kirim kebalikan dari status sekarang
             })
-        }).then(() => { window.location.reload(); });
+        }).then(() => {
+            window.location.reload();
+        });
     }
 
-    // Update Quantity
-    function updateQty(itemId, change) {
+    // Fungsi Update Qty dengan Batas Max
+    function updateQty(itemId, change, maxStock) {
+        // Cari elemen qty spesifik item ini
+        // Namun karena kita reload page, kita bisa ambil nilai dari DOM dulu untuk validasi pre-fetch
+
+        // PENTING: Logika validasi di sisi client untuk mencegah request error
+        // Kita perlu tahu quantity saat ini. Tapi tombol di atas sudah memanggil fungsi ini.
+        // Kita perlu ambil elemen span qty. Karena id span pakai dynamic ID di loop blade,
+        // Kita cari manual. Namun untuk simplisitas dan keandalan:
+        // Kita bisa rely on server reload, TAPI user minta "indikator tidak bertambah melebihi stok saja".
+        // Jadi kita harus cek current value di DOM.
+
+        // Tips: Untuk mendapatkan current qty, kita bisa cari elemen relatif terhadap tombol yang diklik,
+        // atau gunakan ID unik jika ada. Di Blade di atas saya tidak memberi ID unik ke span qty.
+
         const qtySpan = document.getElementById('qty-text-' + itemId);
+        if(!qtySpan) return;
+
         let currentQty = parseInt(qtySpan.innerText);
         let newQty = currentQty + change;
-        if (newQty < 1) return; // Prevent 0
+
+        // Validasi Min
+        if (newQty < 1) return;
+
+        // Validasi Max (Stok) - Hapus Alert, cukup return/diam
+        if (newQty > maxStock) {
+            return; // Stop, jangan kirim request
+        }
 
         fetch(`{{ url('/cart/update') }}/${itemId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify({ quantity: newQty })
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                quantity: newQty
+            })
         })
         .then(response => response.json())
         .then(data => {
             if(data.success) {
                 window.location.reload();
-            } else {
-                alert(data.message || 'Gagal mengupdate jumlah.');
             }
+            // Jika gagal (misal race condition stok habis duluan), server akan kirim error,
+            // tapi kita diamkan saja atau reload untuk update UI stok terbaru.
         });
     }
 </script>

@@ -16,7 +16,7 @@ class CartController extends Controller
     {
         $user = Auth::user();
 
-        // Logika Back Button (sama seperti sebelumnya)
+        // Logika Back Button
         $previousUrl = url()->previous();
         $currentUrl = url()->current();
         if ($previousUrl !== $currentUrl && !str_contains($previousUrl, '/cart')) {
@@ -30,9 +30,8 @@ class CartController extends Controller
         // Ambil item sesuai tab
         $items = $cart->items()->where('type', $activeTab)->with('book')->get();
 
-        // Hitung Total hanya dari item yang dicentang (is_selected = 1)
+        // Hitung Total (Hanya yang dicentang)
         $selectedItems = $items->where('is_selected', true);
-
         $subtotal = $selectedItems->sum(function($item) {
             return $item->subtotal;
         });
@@ -53,7 +52,6 @@ class CartController extends Controller
         ]);
     }
 
-    // Menambah item ke keranjang (Sama seperti sebelumnya dengan validasi stok awal)
     public function add(Request $request)
     {
         $user = Auth::user();
@@ -70,12 +68,13 @@ class CartController extends Controller
                 if ($book->stok_beli < $quantity) {
                     throw new \Exception('Books ordered exceed stock!');
                 }
-                $book->stok_beli -= $quantity;
+                $book->stok_beli -= $quantity; // Kurangi stok fisik
             } else {
+                // Sewa: Cek stok fisik > 0
                 if ($book->stok_sewa < 1) {
                      throw new \Exception('Books ordered exceed stock!');
                 }
-                $book->stok_sewa -= 1;
+                $book->stok_sewa -= 1; // Kurangi 1 unit fisik
             }
             $book->save();
 
@@ -92,6 +91,7 @@ class CartController extends Controller
                     ]);
                 }
             } else {
+                // Sewa selalu item baru
                 $cart->items()->create([
                     'book_id' => $bookId, 'type' => 'sewa', 'quantity' => $quantity, 'is_selected' => true
                 ]);
@@ -100,7 +100,7 @@ class CartController extends Controller
             DB::commit();
 
             if ($request->wantsJson()) {
-                return response()->json(['success' => true, 'message' => 'Berhasil ditambahkan']);
+                return response()->json(['success' => true]);
             }
             return redirect()->route('cart.index', ['tab' => $type])->with('success', 'Berhasil');
 
@@ -113,41 +113,39 @@ class CartController extends Controller
         }
     }
 
-    // UPDATE QUANTITY (Logika Baru: Cek Stok sebelum tambah)
+    // UPDATE (Logic Server Side tetap menjaga konsistensi stok)
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
         try {
             $item = CartItem::with('book')->findOrFail($id);
-            $book = $item->book; // Lock row if needed
+            $book = $item->book;
 
-            // Jika update quantity
             if ($request->has('quantity')) {
                 $newQty = (int) $request->input('quantity');
                 $diff = $newQty - $item->quantity;
 
-                if ($item->type == 'beli') {
-                    // Jika menambah jumlah beli, cek stok beli buku
-                    if ($diff > 0) {
-                        if ($book->stok_beli < $diff) {
-                            throw new \Exception('Stok tidak mencukupi!');
+                if ($diff != 0) {
+                    if ($item->type == 'beli') {
+                        // Cek stok lagi di server untuk keamanan
+                        if ($diff > 0) {
+                            if ($book->stok_beli < $diff) {
+                                // Jangan lempar error 500, tapi kembalikan status sukses false
+                                // agar JS bisa handle (misal revert UI)
+                                return response()->json(['success' => false, 'message' => 'Stok habis'], 200);
+                            }
+                            $book->stok_beli -= $diff;
+                        } else {
+                            $book->stok_beli += abs($diff);
                         }
-                        $book->stok_beli -= $diff; // Kurangi stok buku
-                    } else {
-                        // Jika mengurangi jumlah beli, kembalikan stok ke buku
-                        $book->stok_beli += abs($diff);
+                        $book->save();
                     }
+                    $item->quantity = $newQty;
                 }
-                // Untuk sewa, quantity adalah durasi, jadi tidak mempengaruhi stok fisik (stok sewa buku tetap -1 per item)
-                // Jadi kita bisa langsung update quantity (durasi) tanpa ubah stok buku
-
-                $book->save();
-                $item->quantity = $newQty;
             }
 
-            // Jika update selection (checkbox)
             if ($request->has('is_selected')) {
-                $item->is_selected = $request->input('is_selected');
+                $item->is_selected = filter_var($request->input('is_selected'), FILTER_VALIDATE_BOOLEAN);
             }
 
             $item->save();
@@ -161,7 +159,7 @@ class CartController extends Controller
         }
     }
 
-    // REMOVE ITEM (Logika Baru: Kembalikan Stok)
+    // REMOVE ITEM
     public function remove($id)
     {
         DB::beginTransaction();
@@ -170,11 +168,11 @@ class CartController extends Controller
             $book = $item->book;
             $type = $item->type;
 
-            // Kembalikan stok ke buku
+            // Kembalikan stok ke buku saat dihapus dari keranjang
             if ($type == 'beli') {
                 $book->stok_beli += $item->quantity;
             } else {
-                // Sewa: Kembalikan 1 stok unit fisik
+                // Sewa: Kembalikan 1 unit stok fisik
                 $book->stok_sewa += 1;
             }
             $book->save();
