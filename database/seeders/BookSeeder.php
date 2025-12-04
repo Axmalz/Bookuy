@@ -137,14 +137,14 @@ class BookSeeder extends Seeder
 
         // Buat 10 buku acak lainnya via Factory
         // Pastikan Factory juga diupdate untuk stok random (sudah ada di langkah sebelumnya)
-        Book::factory(10)->create([
+        Book::factory(50)->create([
             'user_id' => User::inRandomOrder()->first()->id
         ]);
 
         // Buat Reviews
         $allBooks = Book::all();
         foreach ($allBooks as $book) {
-            $numberOfReviews = rand(3, 10);
+            $numberOfReviews = rand(10, 25);
             for ($j = 0; $j < $numberOfReviews; $j++) {
                 Review::factory()->create([
                     'book_id' => $book->id,

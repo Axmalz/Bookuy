@@ -1,21 +1,42 @@
 @extends('layouts.app-main')
 
 @section('main-content')
-<div class="w-full bg-white relative">
 
-    <!-- ... (Header & Account Security Tetap Sama) ... -->
+<!-- FIX: Override CSS untuk menghilangkan padding bawaan layout yang menyebabkan 'blok putih' -->
+@push('styles')
+<style>
+    /* Paksa padding bawah container utama menjadi 0 khusus di halaman ini */
+    body .iphone-screen .app-content {
+        padding-bottom: 0 !important;
+    }
+</style>
+@endpush
+
+<!--
+    Wrapper utama:
+    - min-h-full: Agar background putih mengisi setidaknya setinggi layar.
+    - relative: Agar elemen di dalamnya bisa diposisikan relatif terhadap ini.
+-->
+<div class="w-full bg-white min-h-full relative">
+
     <!-- 1. Header Biru dengan Profil -->
     <div class="relative bg-blue-600 pb-10 pt-14 rounded-b-[40px] shadow-lg z-10 px-8 flex items-center gap-5">
-        <!-- ... -->
-         <div class="w-20 h-20 rounded-full border-4 border-white/30 overflow-hidden bg-gray-200 shadow-md flex-shrink-0">
+
+        <!-- Foto Profil -->
+        <div class="w-20 h-20 rounded-full border-4 border-white/30 overflow-hidden bg-gray-200 shadow-md flex-shrink-0">
             @if(Auth::user()->profile_photo_path)
                 <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" class="w-full h-full object-cover">
             @else
                 <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=random&size=128" class="w-full h-full object-cover">
             @endif
         </div>
+
+        <!-- Info User (Nama & Link Edit) -->
         <div class="flex flex-col text-left text-white min-w-0">
+            <!-- Nama User -->
             <h2 class="font-sugo text-3xl tracking-wide leading-none mb-1 truncate">{{ Auth::user()->name }}</h2>
+
+            <!-- Tombol Edit Profile -->
             <a href="{{ route('profile.edit') }}" class="text-blue-100 text-xs font-medium flex items-center gap-1 hover:text-white transition-colors group">
                 Edit Profile
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3 group-hover:translate-x-0.5 transition-transform">
@@ -26,11 +47,16 @@
     </div>
 
     <!-- 2. Menu List -->
-    <div class="px-6 pt-6 pb-24 space-y-6">
+    <!--
+      FIX: 'pb-32' (128px) ditambahkan di sini.
+      Ini memberikan ruang di dalam background putih agar item terakhir bisa di-scroll
+      melewati navbar tanpa tertutup, menggantikan padding global yang kita hapus.
+    -->
+    <div class="px-6 pt-6 pb-32 space-y-6">
 
         <!-- Account Security -->
         <div>
-             <h3 class="font-bold text-gray-900 text-base mb-3">Account Security</h3>
+            <h3 class="font-bold text-gray-900 text-base mb-3">Account Security</h3>
             <a href="#" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -45,11 +71,9 @@
             </a>
         </div>
 
-        <!-- == Sales List (DIPERBARUI) == -->
+        <!-- Sales List -->
         <div>
             <h3 class="font-bold text-gray-900 text-base mb-3">Sales List</h3>
-
-            <!-- LINK MENGARAH KE SEARCH DENGAN FILTER SELLER -->
             <a href="{{ route('search.index', ['seller' => Auth::id()]) }}" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -60,18 +84,15 @@
                         <p class="text-xs text-gray-400">See what you are selling here!</p>
                     </div>
                 </div>
-                <!-- Indikator Jumlah Buku (Realtime) -->
                 <div class="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                     {{ \App\Models\Book::where('user_id', Auth::id())->count() }}
                 </div>
             </a>
         </div>
 
-        <!-- ... (Sisa menu: Purchase History, Info, Logout tetap sama) ... -->
         <!-- Purchase History -->
         <div>
             <h3 class="font-bold text-gray-900 text-base mb-3">History</h3>
-            <!-- Sales History -->
             <a href="{{ route('profile.sales_history') }}" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -85,7 +106,6 @@
                 <div class="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">1</div>
             </a>
 
-            <!-- Purchase History Item -->
             <a href="#" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -103,8 +123,7 @@
         <!-- Information -->
         <div>
             <h3 class="font-bold text-gray-900 text-base mb-3">Information</h3>
-            <!-- Address -->
-            <a href="#" class="flex items-center justify-between py-3 border-b border-gray-100 group">
+            <a href="{{ route('address.index') }}" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
                         <img src="{{ asset('images/icon-map-pin.png') }}" alt="Address" class="w-5 h-5">
@@ -116,7 +135,6 @@
                 </div>
             </a>
 
-            <!-- Payment -->
             <a href="#" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -141,7 +159,6 @@
             </form>
         </div>
 
-        <div class="h-10 w-full"></div>
     </div>
 </div>
 @endsection

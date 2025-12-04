@@ -7,6 +7,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ProductController; // Import
 use App\Http\Controllers\CartController; // Import CartController
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AddressController; // Import di atas
 
 /*
 |--------------------------------------------------------------------------
@@ -93,3 +94,14 @@ Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.s
 // Product Edit & Update (BARU)
 Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit')->middleware('auth');
 Route::post('/product/{id}/update', [ProductController::class, 'update'])->name('product.update')->middleware('auth');
+
+// Group Rute Address
+Route::middleware('auth')->group(function () {
+    Route::get('/address', [AddressController::class, 'index'])->name('address.index');
+    Route::get('/address/create', [AddressController::class, 'create'])->name('address.create');
+    Route::post('/address/store', [AddressController::class, 'store'])->name('address.store');
+    Route::get('/address/set-default/{id}', [AddressController::class, 'setDefault'])->name('address.setDefault');
+    Route::get('/address/edit/{id}', [AddressController::class, 'edit'])->name('address.edit');
+    Route::post('/address/update/{id}', [AddressController::class, 'update'])->name('address.update');
+    Route::delete('/address/delete/{id}', [AddressController::class, 'destroy'])->name('address.destroy');
+});
