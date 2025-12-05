@@ -2,22 +2,17 @@
 
 @section('main-content')
 
-<!-- FIX: Override CSS untuk menghilangkan padding bawaan layout yang menyebabkan 'blok putih' -->
+<!-- FIX: Override CSS untuk menghilangkan blok putih / padding berlebih -->
 @push('styles')
 <style>
-    /* Paksa padding bawah container utama menjadi 0 khusus di halaman ini */
+    /* Kita mereset padding-bottom dari layout utama agar tidak ada ruang kosong besar */
     body .iphone-screen .app-content {
         padding-bottom: 0 !important;
     }
 </style>
 @endpush
 
-<!--
-    Wrapper utama:
-    - min-h-full: Agar background putih mengisi setidaknya setinggi layar.
-    - relative: Agar elemen di dalamnya bisa diposisikan relatif terhadap ini.
--->
-<div class="w-full bg-white min-h-full relative">
+<div class="w-full bg-white relative">
 
     <!-- 1. Header Biru dengan Profil -->
     <div class="relative bg-blue-600 pb-10 pt-14 rounded-b-[40px] shadow-lg z-10 px-8 flex items-center gap-5">
@@ -36,9 +31,10 @@
             <!-- Nama User -->
             <h2 class="font-sugo text-3xl tracking-wide leading-none mb-1 truncate">{{ Auth::user()->name }}</h2>
 
-            <!-- Tombol Edit Profile -->
+            <!-- Tombol Edit Profile (Link dengan Panah) -->
             <a href="{{ route('profile.edit') }}" class="text-blue-100 text-xs font-medium flex items-center gap-1 hover:text-white transition-colors group">
                 Edit Profile
+                <!-- Icon Panah Kanan (SVG) -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3 group-hover:translate-x-0.5 transition-transform">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
@@ -48,15 +44,15 @@
 
     <!-- 2. Menu List -->
     <!--
-      FIX: 'pb-32' (128px) ditambahkan di sini.
-      Ini memberikan ruang di dalam background putih agar item terakhir bisa di-scroll
-      melewati navbar tanpa tertutup, menggantikan padding global yang kita hapus.
+      FIX: Menambah pb-32 untuk memberikan ruang yang cukup di bawah
+      agar item terakhir bisa di-scroll melewati navbar, menggantikan padding global yang dihapus.
     -->
     <div class="px-6 pt-6 pb-32 space-y-6">
 
         <!-- Account Security -->
         <div>
             <h3 class="font-bold text-gray-900 text-base mb-3">Account Security</h3>
+            <!-- Privacy & Security -->
             <a href="#" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -77,6 +73,7 @@
             <a href="{{ route('search.index', ['seller' => Auth::id()]) }}" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                        <!-- Icon Shopping Bag -->
                         <img src="{{ asset('images/icon-shopping-bag.png') }}" alt="Sales List" class="w-5 h-5">
                     </div>
                     <div>
@@ -84,6 +81,7 @@
                         <p class="text-xs text-gray-400">See what you are selling here!</p>
                     </div>
                 </div>
+                <!-- Indikator Jumlah Buku -->
                 <div class="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                     {{ \App\Models\Book::where('user_id', Auth::id())->count() }}
                 </div>
@@ -93,6 +91,7 @@
         <!-- Purchase History -->
         <div>
             <h3 class="font-bold text-gray-900 text-base mb-3">History</h3>
+            <!-- Sales History -->
             <a href="{{ route('profile.sales_history') }}" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -106,6 +105,7 @@
                 <div class="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">1</div>
             </a>
 
+            <!-- Purchase History Item -->
             <a href="#" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -123,6 +123,7 @@
         <!-- Information -->
         <div>
             <h3 class="font-bold text-gray-900 text-base mb-3">Information</h3>
+            <!-- Address -->
             <a href="{{ route('address.index') }}" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
@@ -135,7 +136,8 @@
                 </div>
             </a>
 
-            <a href="#" class="flex items-center justify-between py-3 border-b border-gray-100 group">
+            <!-- Payment (DIEDIT: Mengarah ke payment.index) -->
+            <a href="{{ route('payment.index') }}" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
                         <img src="{{ asset('images/icon-credit-card.png') }}" alt="Payment" class="w-5 h-5">
@@ -158,6 +160,8 @@
                 </button>
             </form>
         </div>
+
+        <div class="h-10 w-full"></div>
 
     </div>
 </div>

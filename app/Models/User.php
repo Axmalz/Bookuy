@@ -72,4 +72,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+    // Relasi ke Payment
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }

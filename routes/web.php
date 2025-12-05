@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController; // Import
 use App\Http\Controllers\CartController; // Import CartController
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AddressController; // Import di atas
+use App\Http\Controllers\PaymentController; // Import PaymentController
 
 /*
 |--------------------------------------------------------------------------
@@ -95,7 +96,7 @@ Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.s
 Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit')->middleware('auth');
 Route::post('/product/{id}/update', [ProductController::class, 'update'])->name('product.update')->middleware('auth');
 
-// Group Rute Address
+// Group Rute Address & Payment dengan Middleware Auth
 Route::middleware('auth')->group(function () {
     Route::get('/address', [AddressController::class, 'index'])->name('address.index');
     Route::get('/address/create', [AddressController::class, 'create'])->name('address.create');
@@ -104,4 +105,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/address/edit/{id}', [AddressController::class, 'edit'])->name('address.edit');
     Route::post('/address/update/{id}', [AddressController::class, 'update'])->name('address.update');
     Route::delete('/address/delete/{id}', [AddressController::class, 'destroy'])->name('address.destroy');
+
+    Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
+    Route::get('/payment/create', [PaymentController::class, 'create'])->name('payment.create');
+    Route::post('/payment/store', [PaymentController::class, 'store'])->name('payment.store');
+    Route::get('/payment/edit/{id}', [PaymentController::class, 'edit'])->name('payment.edit');
+    Route::post('/payment/update/{id}', [PaymentController::class, 'update'])->name('payment.update');
+    Route::get('/payment/set-default/{id}', [PaymentController::class, 'setDefault'])->name('payment.setDefault');
+    Route::delete('/payment/delete/{id}', [PaymentController::class, 'destroy'])->name('payment.destroy');
 });
