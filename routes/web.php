@@ -9,6 +9,8 @@ use App\Http\Controllers\CartController; // Import CartController
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AddressController; // Import di atas
 use App\Http\Controllers\PaymentController; // Import PaymentController
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CourierController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,3 +116,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/set-default/{id}', [PaymentController::class, 'setDefault'])->name('payment.setDefault');
     Route::delete('/payment/delete/{id}', [PaymentController::class, 'destroy'])->name('payment.destroy');
 });
+
+// Checkout Routes
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index')->middleware('auth');
+Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process')->middleware('auth');
+Route::get('/checkout/success/{orderId}', [CheckoutController::class, 'success'])->name('checkout.success')->middleware('auth');
+Route::get('/track-order/{id}', [CheckoutController::class, 'track'])->name('order.track')->middleware('auth');
+
+// Courier Dashboard Routes (Tanpa Auth Middleware khusus untuk demo mudah)
+Route::get('/kurir', [CourierController::class, 'index'])->name('courier.index');
+Route::post('/kurir/update/{id}', [CourierController::class, 'updateStatus'])->name('courier.update');
+Route::get('/kurir/stats', [CourierController::class, 'statistics'])->name('courier.stats');
