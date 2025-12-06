@@ -11,7 +11,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
             </a>
-            <img src="{{ asset('images/icon-bookuy-logo-white.png') }}" alt="Bookuy" class="h-16 w-auto mb-1 drop-shadow-sm">
             <h1 class="font-sugo text-3xl text-white tracking-wide">Keranjang</h1>
         </div>
 

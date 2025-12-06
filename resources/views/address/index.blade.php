@@ -21,54 +21,74 @@
 
         <h3 class="font-bold text-gray-900 text-lg mb-4">Saved Address</h3>
 
-        <div class="space-y-4">
-            @foreach($addresses as $address)
-            <!-- Segmen Alamat -->
-            <div class="border rounded-2xl p-4 flex items-start gap-3 relative transition-all duration-300
-                        {{ $address->is_default ? 'border-blue-500 bg-blue-50/20' : 'border-gray-200 bg-white' }}">
+        @if($addresses->count() > 0)
+            <div class="space-y-4">
+                @foreach($addresses as $address)
+                <!-- Segmen Alamat -->
+                <div class="border rounded-2xl p-4 flex items-start gap-3 relative transition-all duration-300
+                            {{ $address->is_default ? 'border-blue-500 bg-blue-50/20' : 'border-gray-200 bg-white' }}">
 
-                <!-- Icon Lokasi -->
-                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <img src="{{ asset('images/icon-location-pin.png') }}" class="w-5 h-5">
-                </div>
-
-                <!-- Detail -->
-                <div class="flex-grow min-w-0 pr-8"> <!-- pr-8 memberi ruang untuk radio button -->
-                    <div class="flex items-center gap-2 mb-1">
-                        <h4 class="font-bold text-gray-900 text-sm truncate">{{ $address->nickname }}</h4>
-                        @if($address->is_default)
-                            <span class="bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-md">Default</span>
-                        @endif
+                    <!-- Icon Lokasi -->
+                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <img src="{{ asset('images/icon-location-pin.png') }}" class="w-5 h-5">
                     </div>
-                    <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">
-                        {{ $address->full_address }}
-                    </p>
 
-                    <!-- Tombol Edit & Hapus (Hanya muncul jika alamat ini Default/Aktif) -->
-                    @if($address->is_default)
-                    <div class="flex items-center gap-3 mt-3">
-                        <a href="{{ route('address.edit', $address->id) }}" class="text-blue-600 text-xs font-bold flex items-center gap-1 hover:underline">
-                            Edit
-                        </a>
-                        <form action="{{ route('address.destroy', $address->id) }}" method="POST" onsubmit="return confirm('Hapus alamat ini?');">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 text-xs font-bold flex items-center gap-1 hover:underline">
-                                Delete
-                            </button>
-                        </form>
+                    <!-- Detail -->
+                    <div class="flex-grow min-w-0 pr-8"> <!-- pr-8 memberi ruang untuk radio button -->
+                        <div class="flex items-center gap-2 mb-1">
+                            <h4 class="font-bold text-gray-900 text-sm truncate">{{ $address->nickname }}</h4>
+                            @if($address->is_default)
+                                <span class="bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-md">Default</span>
+                            @endif
+                        </div>
+                        <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                            {{ $address->full_address }}
+                        </p>
+
+                        <!-- Tombol Edit & Hapus (Muncul di semua alamat agar user bisa manage) -->
+                        <!-- DIEDIT: Tombol Edit & Delete sekarang muncul untuk semua item agar lebih mudah dikelola,
+                             tetapi tombol delete disabled untuk alamat default -->
+                        <div class="flex items-center gap-4 mt-3">
+                            <a href="{{ route('address.edit', $address->id) }}" class="text-blue-600 text-xs font-bold flex items-center gap-1 hover:underline">
+                                <img src="{{ asset('images/icon-edit-pencil.png') }}" class="w-3 h-3 mr-1"> Edit
+                            </a>
+
+                            @if(!$address->is_default)
+                                <form action="{{ route('address.destroy', $address->id) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    @method('DELETE')
+                                    <!-- Menggunakan onclick sederhana untuk konfirmasi -->
+                                    <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus alamat ini?')" class="text-red-500 text-xs font-bold flex items-center gap-1 hover:underline cursor-pointer">
+                                        <img src="{{ asset('images/icon-trash-red.png') }}" class="w-3 h-3 mr-1"> Delete
+                                    </button>
+                                </form>
+                            @else
+                                <!-- Jika default, tombol delete disabled/hidden atau beri info -->
+                                <span class="text-gray-400 text-xs font-bold cursor-not-allowed" title="Ubah default ke alamat lain untuk menghapus">
+                                    Delete
+                                </span>
+                            @endif
+                        </div>
                     </div>
-                    @endif
-                </div>
 
-                <!-- Radio Button (Absolute Right) -->
-                <!-- Klik radio untuk set default -->
-                <a href="{{ route('address.setDefault', $address->id) }}" class="absolute top-4 right-4">
-                    <img src="{{ $address->is_default ? asset('images/icon-radio-active.png') : asset('images/icon-radio-inactive.png') }}"
-                         class="w-6 h-6 cursor-pointer hover:scale-110 transition-transform">
-                </a>
+                    <!-- Radio Button (Absolute Right) -->
+                    <!-- Klik radio untuk set default -->
+                    <a href="{{ route('address.setDefault', $address->id) }}" class="absolute top-4 right-4">
+                        <img src="{{ $address->is_default ? asset('images/icon-radio-active.png') : asset('images/icon-radio-inactive.png') }}"
+                             class="w-6 h-6 cursor-pointer hover:scale-110 transition-transform">
+                    </a>
+                </div>
+                @endforeach
             </div>
-            @endforeach
-        </div>
+        @else
+             <!-- Empty State -->
+             <div class="flex flex-col items-center justify-center h-64 text-center text-gray-400">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                    <img src="{{ asset('images/icon-map-pin.png') }}" class="w-8 h-8 opacity-50">
+                </div>
+                <p class="text-sm">Belum ada alamat tersimpan.</p>
+            </div>
+        @endif
 
         <!-- Tombol Add New Address -->
         @if($addresses->count() < 5)

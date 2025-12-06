@@ -8,12 +8,12 @@
     -->
     <div id="product-header" class="absolute top-0 left-0 w-full z-40 px-6 pt-14 pb-4 flex justify-between items-center transition-colors duration-300 pointer-events-none">
 
-        <!-- Logika Tombol Back (Tetap Sama) -->
+        <!-- Logika Tombol Back -->
         @php
             $prevUrl = url()->previous();
             $currentUrl = url()->current();
 
-            $avoidUrls = ['/cart', '/login', '/signup', '/register', '/edit'];
+            $avoidUrls = ['/cart', '/login', '/signup', '/register'];
 
             $shouldGoHome = $prevUrl == $currentUrl;
 
@@ -38,29 +38,16 @@
         <!-- Logo Tengah -->
         <img src="{{ asset('images/icon-bookuy-logo-white.png') }}" alt="Bookuy" class="h-16 w-auto drop-shadow-md pointer-events-auto">
 
-        <!--
-          Kanan: Tombol Aksi (Edit atau Cart)
-          Logika: Cek apakah user login DAN apakah ID user sama dengan ID penjual buku
-        -->
+        <!-- Kanan: SELALU Tombol Keranjang (Sesuai Request) -->
         <div class="pointer-events-auto">
-            @if(Auth::check() && Auth::id() == $book->user_id)
-                <!-- TOMBOL EDIT (Khusus Penjual) -->
-                <a href="{{ route('product.edit', $book->id) }}" class="text-white drop-shadow-md hover:text-yellow-300 transition-colors" title="Edit Produk">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                    </svg>
-                </a>
-            @else
-                <!-- TOMBOL KERANJANG (Untuk Pembeli/Guest) -->
-                <a href="{{ route('cart.index') }}" class="text-white drop-shadow-md relative hover:text-gray-200 transition-colors">
-                    <img src="{{ asset('images/icon-cart-white.png') }}" alt="Cart" class="w-7 h-7">
-                    @if($cartCount > 0)
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transform scale-100 transition-transform duration-200" id="cart-badge">
-                        {{ $cartCount }}
-                    </span>
-                    @endif
-                </a>
-            @endif
+            <a href="{{ route('cart.index') }}" class="text-white drop-shadow-md relative hover:text-gray-200 transition-colors">
+                <img src="{{ asset('images/icon-cart-white.png') }}" alt="Cart" class="w-7 h-7">
+                @if($cartCount > 0)
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transform scale-100 transition-transform duration-200" id="cart-badge">
+                    {{ $cartCount }}
+                </span>
+                @endif
+            </a>
         </div>
     </div>
 
@@ -113,6 +100,17 @@
                 <div class="text-gray-500 text-right">{{ $book->category->name }}</div>
                 <div class="text-gray-900 font-bold">Halaman</div>
                 <div class="text-gray-500 text-right">{{ $book->jumlah_halaman }}</div>
+
+                <!-- Info Stok -->
+                <div class="text-gray-900 font-bold">Stok Beli</div>
+                <div class="text-gray-500 text-right font-bold {{ ($book->stok_beli ?? 0) > 0 ? 'text-green-600' : 'text-red-500' }}">
+                    {{ ($book->stok_beli ?? 0) > 0 ? $book->stok_beli . ' Pcs' : 'Habis' }}
+                </div>
+
+                <div class="text-gray-900 font-bold">Stok Sewa</div>
+                <div class="text-gray-500 text-right font-bold {{ ($book->stok_sewa ?? 0) > 0 ? 'text-green-600' : 'text-red-500' }}">
+                    {{ ($book->stok_sewa ?? 0) > 0 ? $book->stok_sewa . ' Pcs' : 'Habis' }}
+                </div>
             </div>
 
             <!-- Penjual -->
@@ -162,7 +160,7 @@
                 </div>
             </div>
 
-            <!-- Reviews & Filter -->
+            <!-- Reviews -->
             <div>
                 <form id="review-filter-form" action="{{ route('product.show', $book->id) }}" method="GET">
                     <div class="flex justify-between items-center mb-4">
@@ -218,26 +216,41 @@
             <img src="{{ asset('images/icon-chat-blue.png') }}" class="w-6 h-6 filter brightness-0 invert">
         </button>
 
-        <!-- KONTROL TOMBOL BAWAH BERDASARKAN PERAN -->
+        <!-- KONTROL TOMBOL (MODIFIED: Edit Button di Bawah untuk Penjual) -->
         @if(Auth::check() && Auth::id() == $book->user_id)
-            <!-- Jika Penjual: Tombol Edit (Full Width) -->
-            <a href="{{ route('product.edit', $book->id) }}" class="flex-grow ml-4 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-yellow-600 transition-colors font-bold tracking-wide">
+            <!-- JIKA PENJUAL: Tombol Edit Panjang (Menggantikan Sewa & Beli) -->
+            <a href="{{ route('product.edit', $book->id) }}" class="flex-grow ml-4 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-yellow-600 transition-colors font-bold text-sm tracking-wide">
                 Edit Product
             </a>
         @else
-            <!-- Jika Pembeli: Tombol Beli & Sewa -->
-            <button onclick="openPurchaseModal('sewa')" class="flex-grow ml-4 h-12 bg-blue-400 rounded-full flex flex-col items-center justify-center text-white shadow-lg hover:bg-blue-500 transition-colors">
-                <span class="text-sm font-bold leading-none">Sewa</span>
-                <span class="text-[10px] opacity-90">Rp {{ number_format($book->harga_sewa, 0, ',', '.') }}</span>
-            </button>
-            <button onclick="openPurchaseModal('beli')" class="flex-grow ml-3 h-12 bg-yellow-500 rounded-full flex flex-col items-center justify-center text-white shadow-lg hover:bg-yellow-600 transition-colors">
-                <span class="text-sm font-bold leading-none">Beli</span>
-                <span class="text-[10px] opacity-90">Rp {{ number_format($book->harga_beli, 0, ',', '.') }}</span>
-            </button>
+            <!-- JIKA PEMBELI: Tombol Sewa & Beli Normal -->
+            @if(($book->stok_sewa ?? 0) > 0)
+                <button onclick="openPurchaseModal('sewa')" class="flex-grow ml-4 h-12 bg-blue-400 rounded-full flex flex-col items-center justify-center text-white shadow-lg hover:bg-blue-500 transition-colors">
+                    <span class="text-sm font-bold leading-none">Sewa</span>
+                    <span class="text-[10px] opacity-90">Rp {{ number_format($book->harga_sewa, 0, ',', '.') }}</span>
+                </button>
+            @else
+                <button disabled class="flex-grow ml-4 h-12 bg-gray-400/50 rounded-full flex flex-col items-center justify-center text-white/70 shadow-none cursor-not-allowed border border-white/20">
+                    <span class="text-sm font-bold leading-none">Stok Habis</span>
+                    <span class="text-[10px]">Sewa</span>
+                </button>
+            @endif
+
+            @if(($book->stok_beli ?? 0) > 0)
+                <button onclick="openPurchaseModal('beli')" class="flex-grow ml-3 h-12 bg-yellow-500 rounded-full flex flex-col items-center justify-center text-white shadow-lg hover:bg-yellow-600 transition-colors">
+                    <span class="text-sm font-bold leading-none">Beli</span>
+                    <span class="text-[10px] opacity-90">Rp {{ number_format($book->harga_beli, 0, ',', '.') }}</span>
+                </button>
+            @else
+                <button disabled class="flex-grow ml-3 h-12 bg-gray-400/50 rounded-full flex flex-col items-center justify-center text-white/70 shadow-none cursor-not-allowed border border-white/20">
+                    <span class="text-sm font-bold leading-none">Stok Habis</span>
+                    <span class="text-[10px]">Beli</span>
+                </button>
+            @endif
         @endif
     </div>
 
-    <!-- PURCHASE POPUP (Hanya untuk Pembeli) -->
+    <!-- PURCHASE POPUP (Modal) -->
     @if(Auth::check() && Auth::id() != $book->user_id)
     <div id="modal-container" class="absolute inset-0 z-[60] pointer-events-none overflow-hidden">
         <div id="modal-overlay" class="absolute inset-0 bg-black/60 transition-opacity duration-300 opacity-0 pointer-events-auto hidden"></div>
@@ -278,7 +291,6 @@
                     <button id="modal-action-btn" onclick="showSuccessState()" class="flex-1 py-3 bg-yellow-500 text-white rounded-full text-center font-bold text-sm shadow-lg">Sewa</button>
                 </div>
             </div>
-
             <div id="modal-content-success" class="hidden px-6 pb-12 pt-4 flex-col items-center text-center h-[350px] justify-center">
                 <h2 class="text-3xl font-sugo text-blue-600 mb-2">Congratulations!</h2>
                 <p class="text-gray-500 text-sm mb-8">Your order has been Added to Cart.</p>
@@ -302,6 +314,7 @@
 
 @push('scripts')
 <script>
+    // ... (Script JS sama persis seperti sebelumnya) ...
     const items = document.querySelectorAll('.carousel-item');
     const nextBtn = document.getElementById('next-btn');
     const prevBtn = document.getElementById('prev-btn');
@@ -314,7 +327,6 @@
             item.classList.remove('z-20', 'z-10', 'scale-100', 'scale-90', 'translate-x-0', 'translate-x-[60%]', '-translate-x-[60%]');
             item.classList.add('hidden');
             if(blurLayer) blurLayer.classList.remove('opacity-0', 'opacity-100');
-
             if (index === currentIndex) {
                 item.classList.remove('hidden');
                 item.classList.add('z-20', 'scale-100', 'translate-x-0', 'w-[200px]', 'h-[300px]', 'left-1/2', '-ml-[100px]');
@@ -332,10 +344,8 @@
         if(totalItems > 1) { prevBtn.classList.remove('hidden'); nextBtn.classList.remove('hidden'); }
         else { prevBtn.classList.add('hidden'); nextBtn.classList.add('hidden'); }
     }
-
     items.forEach(item => item.classList.add('absolute', 'top-1/2', '-translate-y-1/2', 'rounded-xl', 'shadow-2xl'));
     updateCarousel();
-
     nextBtn.addEventListener('click', () => { currentIndex = (currentIndex + 1) % totalItems; updateCarousel(); });
     prevBtn.addEventListener('click', () => { currentIndex = (currentIndex - 1 + totalItems) % totalItems; updateCarousel(); });
 
@@ -365,6 +375,7 @@
     const contentSuccess = document.getElementById('modal-content-success');
     const hargaSewa = {{ $book->harga_sewa }};
     const hargaBeli = {{ $book->harga_beli }};
+    const stockBeli = {{ $book->stok_beli ?? 0 }};
     let currentMode = 'sewa';
     let quantity = 1;
 
@@ -376,7 +387,13 @@
     }
     window.closePurchaseModal = function() { sheet.classList.add('translate-y-full'); overlay.classList.add('opacity-0'); setTimeout(() => overlay.classList.add('hidden'), 300); }
     window.updateQuantity = function(change) {
-        let newQty = quantity + change; let max = (currentMode === 'sewa') ? 8 : 5;
+        let newQty = quantity + change;
+        let max = 1;
+        if (currentMode === 'sewa') {
+            max = 8;
+        } else {
+            max = stockBeli;
+        }
         if (newQty >= 1 && newQty <= max) { quantity = newQty; updateModalUI(); }
     }
     function updateModalUI() {
