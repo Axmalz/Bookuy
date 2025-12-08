@@ -94,7 +94,7 @@
                     @if($tab == 'ongoing')
                     <div class="flex justify-end mt-3">
                         <!-- Placeholder Link -->
-                        <a href="#" class="bg-blue-600 text-white text-xs font-bold px-6 py-2 rounded-full shadow-md hover:bg-blue-700 transition-colors">
+                        <a href="{{ route('order.track', $order->id) }}" class="bg-blue-600 text-white text-xs font-bold px-6 py-2 rounded-full shadow-md hover:bg-blue-700 transition-colors">
                             Track Order
                         </a>
                     </div>

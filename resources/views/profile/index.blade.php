@@ -106,7 +106,7 @@
             </a>
 
             <!-- Purchase History Item -->
-            <a href="#" class="flex items-center justify-between py-3 border-b border-gray-100 group">
+            <a href="{{ route('profile.purchase_history') }}" class="flex items-center justify-between py-3 border-b border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
                         <img src="{{ asset('images/icon-receipt-refresh.png') }}" alt="Purchase" class="w-5 h-5">

@@ -69,23 +69,30 @@ Route::get('/search', [SearchController::class, 'index'])->name('search.index')-
 Route::post('/search/clear', [SearchController::class, 'clearRecent'])->name('search.clear')->middleware('auth');
 Route::post('/search/remove', [SearchController::class, 'removeRecent'])->name('search.remove')->middleware('auth');
 
-// --- Rute Nav Bar ---
-Route::get('/chat', function () {
-    return view('placeholders.chat');
-})->name('chat.index')->middleware('auth');
+// --- Rute Nav Bar & Profile ---
+Route::middleware('auth')->group(function () {
+    Route::get('/chat', function () { return view('placeholders.chat'); })->name('chat.index');
+    Route::get('/create', function () { return view('placeholders.create'); })->name('create.index');
+    Route::get('/notifications', function () { return view('placeholders.notifications'); })->name('notifications.index');
 
-Route::get('/create', function () {
-    return view('placeholders.create');
-})->name('create.index')->middleware('auth');
+    // Profile & History
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 
-Route::get('/notifications', function () {
-    return view('placeholders.notifications');
-})->name('notifications.index')->middleware('auth');
+    // Sales & Purchase History
+    Route::get('/profile/sales-history', [ProfileController::class, 'salesHistory'])->name('profile.sales_history');
+    Route::get('/profile/purchase-history', [ProfileController::class, 'purchaseHistory'])->name('profile.purchase_history'); // <-- BARU
 
-Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index')->middleware('auth');
-Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('auth');
-Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update')->middleware('auth');
-Route::get('/profile/sales-history', [ProfileController::class, 'salesHistory'])->name('profile.sales_history')->middleware('auth');
+    // Product & Review
+    Route::get('/sell', [ProductController::class, 'create'])->name('product.create');
+    Route::post('/sell', [ProductController::class, 'store'])->name('product.store');
+    Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+    Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
+    Route::post('/product/{id}/update', [ProductController::class, 'update'])->name('product.update');
+
+    Route::post('/review/store', [ProductController::class, 'storeReview'])->name('review.store'); // <-- BARU
+});
 
 // Product Create (Jual Buku)
 Route::get('/sell', [ProductController::class, 'create'])->name('product.create')->middleware('auth');

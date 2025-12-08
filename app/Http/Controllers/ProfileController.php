@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
-use App\Models\Order; // Import Model Order
+use App\Models\Order;
 
 class ProfileController extends Controller
 {
@@ -24,7 +24,6 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        // ... (kode update sama seperti sebelumnya)
         $user = Auth::user();
         $request->validate([
             'name' => 'required|string|max:255',
@@ -40,6 +39,9 @@ class ProfileController extends Controller
         $user->description = $request->description;
 
         if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo_path) {
+                Storage::delete($user->profile_photo_path);
+            }
             $path = $request->file('profile_photo')->store('profile-photos', 'public');
             $user->profile_photo_path = $path;
         }
@@ -48,25 +50,46 @@ class ProfileController extends Controller
         return redirect()->route('profile.index')->with('success', 'Profil berhasil diperbarui!');
     }
 
-    // == BARU: Method Sales History ==
+    // Method Sales History (Penjualan - Referensi)
     public function salesHistory(Request $request)
     {
         $user = Auth::user();
-        $tab = $request->query('tab', 'ongoing'); // ongoing | completed
+        $tab = $request->query('tab', 'ongoing');
 
         $query = Order::with('book')
                       ->where('seller_id', $user->id);
 
         if ($tab == 'completed') {
-            // Completed = Status Delivered
             $query->where('status', 'Delivered');
         } else {
-            // Ongoing = Status Packing, Picked, In Transit
             $query->whereIn('status', ['Packing', 'Picked', 'In Transit']);
         }
 
         $orders = $query->latest()->get();
 
         return view('profile.sales_history', compact('orders', 'tab'));
+    }
+
+    // == BARU: Method Purchase History (Pembelian) ==
+    public function purchaseHistory(Request $request)
+    {
+        $user = Auth::user();
+        $tab = $request->query('tab', 'ongoing'); // ongoing | completed
+
+        // Ambil order di mana user adalah PEMBELI (buyer_id)
+        $query = Order::with(['book', 'seller'])
+                      ->where('buyer_id', $user->id);
+
+        if ($tab == 'completed') {
+            // Tab Completed: Status Delivered
+            $query->where('status', 'Delivered');
+        } else {
+            // Tab Ongoing: Status Packing, Picked, In Transit
+            $query->whereIn('status', ['Packing', 'Picked', 'In Transit']);
+        }
+
+        $orders = $query->latest()->get();
+
+        return view('profile.purchase_history', compact('orders', 'tab'));
     }
 }
