@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\URL;
 use App\Http\View\Composers\CartComposer;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,9 +22,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Terapkan CartComposer ke layout utama dan halaman produk
-        // '*' berarti semua view, tapi lebih efisien jika spesifik
-        // Kita gunakan '*' agar aman di semua halaman yang mungkin punya header keranjang
+        // Terapkan CartComposer ke semua view ('*')
+        // Ini membuat variabel $cartCount tersedia di semua halaman (header)
         View::composer('*', CartComposer::class);
+
+        // Paksa HTTPS di lingkungan Production (Railway)
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
