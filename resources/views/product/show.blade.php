@@ -38,7 +38,7 @@
         <!-- Logo Tengah -->
         <img src="{{ asset('images/icon-bookuy-logo-white.png') }}" alt="Bookuy" class="h-16 w-auto drop-shadow-md pointer-events-auto">
 
-        <!-- Kanan: SELALU Tombol Keranjang (Sesuai Request) -->
+        <!-- Kanan: SELALU Tombol Keranjang -->
         <div class="pointer-events-auto">
             <a href="{{ route('cart.index') }}" class="text-white drop-shadow-md relative hover:text-gray-200 transition-colors">
                 <img src="{{ asset('images/icon-cart-white.png') }}" alt="Cart" class="w-7 h-7">
@@ -212,9 +212,19 @@
 
     <!-- 3. Sticky Bottom Bar -->
     <div class="absolute bottom-0 left-0 w-full h-[100px] bg-blue-600 rounded-t-[30px] shadow-[0_-5px_20px_rgba(0,0,0,0.1)] z-50 px-6 flex items-center justify-between">
-        <button class="w-12 h-12 bg-blue-800 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-900 transition-colors">
-            <img src="{{ asset('images/icon-chat-blue.png') }}" class="w-6 h-6 filter brightness-0 invert">
-        </button>
+
+        <!-- TOMBOL CHAT (MODIFIED) -->
+        @if(Auth::check() && Auth::id() == $book->user_id)
+            <!-- Jika User adalah Penjual (Tombol Disabled) -->
+            <button class="w-12 h-12 bg-blue-800/50 rounded-full flex items-center justify-center shadow-none cursor-not-allowed" title="Anda tidak bisa chat diri sendiri">
+                <img src="{{ asset('images/icon-chat-blue.png') }}" class="w-6 h-6 filter brightness-0 invert opacity-50">
+            </button>
+        @else
+            <!-- Link ke Chat Room dengan ID Penjual -->
+            <a href="{{ route('chat.show', $book->user_id) }}" class="w-12 h-12 bg-blue-800 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-900 transition-colors">
+                <img src="{{ asset('images/icon-chat-blue.png') }}" class="w-6 h-6 filter brightness-0 invert">
+            </a>
+        @endif
 
         <!-- KONTROL TOMBOL (MODIFIED: Edit Button di Bawah untuk Penjual) -->
         @if(Auth::check() && Auth::id() == $book->user_id)
@@ -314,7 +324,6 @@
 
 @push('scripts')
 <script>
-    // ... (Script JS sama persis seperti sebelumnya) ...
     const items = document.querySelectorAll('.carousel-item');
     const nextBtn = document.getElementById('next-btn');
     const prevBtn = document.getElementById('prev-btn');
@@ -367,7 +376,7 @@
         btn.style.display = 'none';
     }
 
-    // --- Modal Logic (Hanya untuk Pembeli) ---
+    // --- Modal Logic ---
     @if(Auth::check() && Auth::id() != $book->user_id)
     const overlay = document.getElementById('modal-overlay');
     const sheet = document.getElementById('modal-sheet');

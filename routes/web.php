@@ -12,6 +12,7 @@ use App\Http\Controllers\PaymentController; // Import PaymentController
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CourierController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,9 +73,9 @@ Route::post('/search/remove', [SearchController::class, 'removeRecent'])->name('
 
 // --- Rute Nav Bar & Profile ---
 Route::middleware('auth')->group(function () {
-    Route::get('/chat', function () { return view('placeholders.chat'); })->name('chat.index');
-    Route::get('/create', function () { return view('placeholders.create'); })->name('create.index');
-    Route::get('/notifications', function () { return view('placeholders.notifications'); })->name('notifications.index');
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/send', [ChatController::class, 'store'])->name('chat.store');
 
     // Profile & History
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
