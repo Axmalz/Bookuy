@@ -41,12 +41,16 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
+# --- PERBAIKAN 404 (Izinkan .htaccess) ---
+# Mengubah AllowOverride None menjadi AllowOverride All agar routing Laravel berfungsi
+RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+
 # Expose port 80 (Railway akan mapping port ini otomatis)
 EXPOSE 80
 
 # Jalankan Apache saat container start
 # CMD menjalankan migrasi dan cache config setiap kali deploy
+# CATATAN: route:cache dihapus karena routes/web.php menggunakan Closure (tidak support cache)
 CMD php artisan config:cache && \
-    php artisan route:cache && \
     php artisan view:cache && \
     apache2-foreground
