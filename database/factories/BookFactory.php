@@ -12,9 +12,14 @@ class BookFactory extends Factory
     {
         $images = [];
         $count = rand(1, 3);
-        $color = $this->faker->hexColor(false);
+        $color = $this->faker->hexColor(); // hexColor bisa dipanggil tanpa parameter (default false untuk #)
+
+        // Hapus tanda pagar '#' jika ada, agar URL bersih
+        $colorClean = str_replace('#', '', $color);
+
         for($i=0; $i<$count; $i++) {
-            $images[] = "https://placehold.co/270x480/{$color}/white?text=Img+" . ($i+1);
+            // Gunakan $colorClean
+            $images[] = "https://placehold.co/270x480/{$colorClean}/white?text=Img+" . ($i+1);
         }
 
         return [
@@ -29,10 +34,12 @@ class BookFactory extends Factory
 
             'gambar_buku' => $images,
             'deskripsi_buku' => $this->faker->paragraph(3),
-            'user_id' => User::first()->id,
+            // Mengambil User pertama sebagai default, atau membuat baru jika kosong
+            'user_id' => User::first()?->id ?? User::factory(),
             'kondisi_buku' => $this->faker->randomElement(['baru', 'bekas premium', 'bekas usang']),
             'alamat_buku' => $this->faker->city() . ', ' . $this->faker->state(),
-            'category_id' => Category::all()->random()->id,
+            // Mengambil Category random, atau membuat baru jika kosong
+            'category_id' => Category::inRandomOrder()->first()?->id ?? Category::factory(),
             'jumlah_halaman' => $this->faker->numberBetween(100, 500),
             'semester' => $this->faker->randomElement(['1', '2', '3', '4', '5', '6', '7', '8', 'tidak ada']),
         ];
