@@ -11,6 +11,7 @@ use App\Http\Controllers\AddressController; // Import di atas
 use App\Http\Controllers\PaymentController; // Import PaymentController
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CourierController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,3 +135,5 @@ Route::get('/track-order/{id}', [CheckoutController::class, 'track'])->name('ord
 Route::get('/kurir', [CourierController::class, 'index'])->name('courier.index');
 Route::post('/kurir/update/{id}', [CourierController::class, 'updateStatus'])->name('courier.update');
 Route::get('/kurir/stats', [CourierController::class, 'statistics'])->name('courier.stats');
+
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notification.index')->middleware('auth');
