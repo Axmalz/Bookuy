@@ -8,12 +8,12 @@ class ReviewFactory extends Factory
 {
     public function definition(): array
     {
+        $faker = \Faker\Factory::create();
+
         return [
-            'rating' => $this->faker->numberBetween(1, 5),
-            'comment' => $this->faker->paragraph(rand(1, 3)), // 1-3 paragraf
-            'created_at' => $this->faker->dateTimeBetween('-3 months', 'now'),
-            // Pastikan user_id dan book_id dihandle oleh Seeder,
-            // atau beri default factory jika dipanggil manual
+            'rating' => $faker->numberBetween(1, 5),
+            'comment' => $faker->paragraph(rand(1, 3)),
+            'created_at' => $faker->dateTimeBetween('-3 months', 'now'),
             'user_id' => \App\Models\User::factory(),
             'book_id' => \App\Models\Book::factory(),
         ];

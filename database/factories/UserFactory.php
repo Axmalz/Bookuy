@@ -11,35 +11,27 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
     protected static ?string $password;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
+        // PENGAMAN: Gunakan helper fake() jika ada, atau buat instance manual jika null
+        $faker = \Faker\Factory::create();
+
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'name' => $faker->name(),
+            'email' => $faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
 
-            // Data Dummy Tambahan (Menggunakan $this->faker)
-            'gender' => $this->faker->randomElement(['Male', 'Female', 'Prefer not to say']),
-            'semester' => $this->faker->randomElement(['1', '2', '3', '4', '5', '6', '7', '8', 'Tidak ada']),
-            'description' => $this->faker->paragraph(2),
+            // Data Dummy Tambahan
+            'gender' => $faker->randomElement(['Male', 'Female', 'Prefer not to say']),
+            'semester' => $faker->randomElement(['1', '2', '3', '4', '5', '6', '7', '8', 'Tidak ada']),
+            'description' => $faker->paragraph(2),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
