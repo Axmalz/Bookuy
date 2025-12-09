@@ -27,8 +27,8 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', CartComposer::class);
 
         // Paksa HTTPS di lingkungan Production (Railway)
-        if ($this->app->environment('production')) {
-            URL::forceScheme('https');
-        }
+        //if ($this->app->environment('production')) {
+        //    URL::forceScheme('https');
+        //}
     }
 }
