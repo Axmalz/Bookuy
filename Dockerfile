@@ -1,7 +1,7 @@
 # Gunakan image PHP 8.2 resmi dengan Apache
 FROM php:8.2-apache
 
-# Install dependencies sistem yang diperlukan
+# Install dependencies sistem
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
@@ -14,43 +14,46 @@ RUN apt-get update && apt-get install -y \
     default-mysql-client \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Aktifkan mod_rewrite Apache untuk URL Laravel
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Set direktori kerja
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy file composer
+# Copy Composer files
 COPY composer.json composer.lock ./
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install dependensi PHP (tanpa dev dependencies untuk production)
+# Install PHP dependencies (no dev)
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Copy seluruh source code proyek
+# Copy application files
 COPY . .
 
-# Set permission folder storage dan cache agar bisa ditulis
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Ubah document root Apache ke folder public
+# Configure Apache Document Root to public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
-# --- PERBAIKAN 404 (Izinkan .htaccess) ---
-# Mengubah AllowOverride None menjadi AllowOverride All agar routing Laravel berfungsi
+# Allow .htaccess override
 RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
-# Expose port 80 (Railway akan mapping port ini otomatis)
-EXPOSE 80
+# --- BAGIAN PENTING: KONFIGURASI PORT DINAMIS ---
+# Ubah port default Apache (80) menjadi port yang diberikan Railway ($PORT) saat runtime
+# Jika $PORT tidak ada, default ke 8000
+RUN sed -s -i -e "s/80/\${PORT:-8000}/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# Jalankan Apache saat container start
-# CMD menjalankan migrasi dan cache config setiap kali deploy
-# CATATAN: route:cache dihapus karena routes/web.php menggunakan Closure (tidak support cache)
+# Expose port (hanya dokumentasi, Railway akan override ini)
+EXPOSE 8000
+
+# Jalankan script startup
+# Kita pakai shell form untuk CMD agar variable expansion ${PORT} bekerja
 CMD php artisan config:cache && \
     php artisan view:cache && \
     apache2-foreground
