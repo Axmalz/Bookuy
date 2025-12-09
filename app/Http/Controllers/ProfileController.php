@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Order;
 
+use App\Models\Notification;
+
 class ProfileController extends Controller
 {
     public function index()
@@ -47,6 +49,15 @@ class ProfileController extends Controller
         }
 
         $user->save();
+
+        Notification::create([
+            'user_id' => $user->id,
+            'title'   => 'Profile Updated!',
+            'message' => 'Informasi profil Anda berhasil disimpan.',
+            'type'    => 'account',
+            'icon'    => 'icon-edit-pencil.png'
+        ]);
+
         return redirect()->route('profile.index')->with('success', 'Profil berhasil diperbarui!');
     }
 

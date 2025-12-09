@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Notification;
+
 class PaymentController extends Controller
 {
     // Halaman Daftar Payment
@@ -51,6 +53,14 @@ class PaymentController extends Controller
             'cvc' => $request->cvc,
             'card_type' => $type,
             'is_default' => $isDefault,
+        ]);
+
+        Notification::create([
+            'user_id' => $user->id,
+            'title'   => 'Payment Method Added!',
+            'message' => "Kartu {$type} Anda berhasil ditambahkan.",
+            'type'    => 'account',
+            'icon'    => 'icon-notif-credit-card.png'
         ]);
 
         // Response JSON untuk handle popup sukses di frontend

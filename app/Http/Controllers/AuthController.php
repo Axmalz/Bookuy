@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
+use App\Models\Notification;
+
 class AuthController extends Controller
 {
     /**
@@ -38,6 +40,14 @@ class AuthController extends Controller
                 'name'     => $request->fullname,
                 'email'    => $request->email,
                 'password' => Hash::make($request->password),
+            ]);
+
+            Notification::create([
+                'user_id' => $user->id,
+                'title'   => 'Welcome Aboard!',
+                'message' => 'Akun Anda berhasil dibuat. Selamat menjelajahi Bookuy!',
+                'type'    => 'system',
+                'icon'    => 'icon-notif-profile.png'
             ]);
 
             // 3. Login User secara otomatis setelah registrasi

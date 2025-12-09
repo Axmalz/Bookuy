@@ -10,6 +10,8 @@ use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Notification;
+
 class CheckoutController extends Controller
 {
     public function index()
@@ -94,6 +96,14 @@ class CheckoutController extends Controller
             $cart->items()->where('is_selected', true)->delete();
 
             DB::commit();
+
+            Notification::create([
+                'user_id' => $user->id,
+                'title'   => 'Order Placed!',
+                'message' => 'Checkout berhasil! Pesananmu sedang diproses oleh penjual.',
+                'type'    => 'transaction',
+                'icon'    => 'icon-notif-shopping-bag.png'
+            ]);
 
             // Redirect ke halaman sukses dengan membawa ID order (ambil salah satu saja untuk link tracking contoh)
             return redirect()->route('checkout.success', ['orderId' => $orderIds[0]]);

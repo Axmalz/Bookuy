@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
@@ -41,5 +42,39 @@ class NotificationController extends Controller
         unset($groups['Older']);
 
         return view('notification.index', compact('groups'));
+    }
+
+    // 1. Menampilkan Form Buat Notifikasi Global
+    public function createGlobal()
+    {
+        return view('notification.create_global');
+    }
+
+    // 2. Proses Kirim ke SEMUA User
+    public function storeGlobal(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'message' => 'required|string',
+            'type' => 'required',
+            'icon' => 'required',
+        ]);
+
+        // Ambil semua user
+        $users = User::all();
+
+        // Loop setiap user dan buatkan notifikasi
+        foreach ($users as $user) {
+            Notification::create([
+                'user_id' => $user->id,
+                'title' => $request->title,
+                'message' => $request->message,
+                'type' => $request->type, // system, promo, info
+                'icon' => $request->icon,
+                'is_read' => false,
+            ]);
+        }
+
+        return redirect()->route('notification.index')->with('success', 'Notifikasi global berhasil dikirim ke ' . $users->count() . ' pengguna!');
     }
 }

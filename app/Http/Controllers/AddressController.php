@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Address;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Notification;
+
 class AddressController extends Controller
 {
     // Halaman Daftar Alamat
@@ -51,6 +53,14 @@ class AddressController extends Controller
             'nickname' => $request->nickname,
             'full_address' => $request->full_address,
             'is_default' => $isDefault,
+        ]);
+
+        Notification::create([
+            'user_id' => $user->id,
+            'title'   => 'New Address Added!',
+            'message' => "Alamat '{$request->nickname}' berhasil ditambahkan ke daftar alamatmu.",
+            'type'    => 'account',
+            'icon'    => 'icon-notif-location-pin.png'
         ]);
 
         // Kita akan handle redirect via JS di view untuk menampilkan modal sukses dulu

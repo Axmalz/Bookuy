@@ -137,3 +137,13 @@ Route::post('/kurir/update/{id}', [CourierController::class, 'updateStatus'])->n
 Route::get('/kurir/stats', [CourierController::class, 'statistics'])->name('courier.stats');
 
 Route::get('/notifications', [NotificationController::class, 'index'])->name('notification.index')->middleware('auth');
+
+Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::get('/notifications/broadcast', [NotificationController::class, 'createGlobal'])
+         ->name('notification.createGlobal');
+
+    Route::post('/notifications/broadcast', [NotificationController::class, 'storeGlobal'])
+         ->name('notification.storeGlobal');
+
+});

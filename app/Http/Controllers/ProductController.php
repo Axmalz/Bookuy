@@ -10,6 +10,8 @@ use App\Models\Order; // <!-- PENTING: Baris ini harus ada
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+use App\Models\Notification;
+
 class ProductController extends Controller
 {
     public function show(Request $request, $id)
@@ -143,6 +145,14 @@ class ProductController extends Controller
         }
         $book->gambar_buku = $imagePaths;
         $book->save();
+
+        Notification::create([
+            'user_id' => Auth::id(),
+            'title'   => 'Book Listed!',
+            'message' => "Buku '{$book->judul_buku}' berhasil didaftarkan untuk dijual/disewa.",
+            'type'    => 'transaction',
+            'icon'    => 'icon-notif-book.png'
+        ]);
 
         return redirect()->route('product.show', $book->id)->with('success', 'Product posted successfully!');
     }

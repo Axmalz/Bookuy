@@ -20,7 +20,7 @@ class NotificationSeeder extends Seeder
             'title' => '20% Special Discount!',
             'message' => 'Promo spesial khusus hari ini untukmu, cek sekarang!',
             'type' => 'promo',
-            'icon' => 'icon-discount.png',
+            'icon' => 'icon-notif-discount.png',
             'created_at' => Carbon::now()->subHours(2)
         ]);
 
@@ -29,7 +29,7 @@ class NotificationSeeder extends Seeder
             'title' => 'Order Delivered!',
             'message' => 'Paket buku "Sistem Enterprise" telah sampai di alamat tujuan.',
             'type' => 'transaction',
-            'icon' => 'icon-box.png',
+            'icon' => 'icon-shopping-bag.png',
             'created_at' => Carbon::now()->subHours(5)
         ]);
 
@@ -39,7 +39,7 @@ class NotificationSeeder extends Seeder
             'title' => 'Top Up E-wallet Successfully!',
             'message' => 'Saldo e-wallet kamu berhasil ditambahkan sebesar Rp 100.000.',
             'type' => 'transaction',
-            'icon' => 'icon-wallet.png',
+            'icon' => 'icon-notif-wallet.png',
             'created_at' => Carbon::yesterday()->setHour(14)
         ]);
 
@@ -48,7 +48,7 @@ class NotificationSeeder extends Seeder
             'title' => 'New Service Available!',
             'message' => 'Sekarang kamu bisa melacak posisi kurir secara real-time.',
             'type' => 'system',
-            'icon' => 'icon-map-pin.png',
+            'icon' => 'icon-notif-map-pin.png',
             'created_at' => Carbon::yesterday()->setHour(10)
         ]);
 
@@ -58,17 +58,8 @@ class NotificationSeeder extends Seeder
             'title' => 'Credit Card Connected!',
             'message' => 'Kartu kredit Visa berakhiran 2512 berhasil dihubungkan.',
             'type' => 'account',
-            'icon' => 'icon-credit-card.png',
+            'icon' => 'icon-notif-credit-card.png',
             'created_at' => Carbon::now()->subDays(5)
-        ]);
-
-        Notification::create([
-            'user_id' => $user->id,
-            'title' => 'Account Setup Successfully!',
-            'message' => 'Selamat datang di Bookuy! Akunmu berhasil dibuat.',
-            'type' => 'account',
-            'icon' => 'icon-check-green.png', // Fallback icon jika profil belum ada icon khusus
-            'created_at' => Carbon::now()->subDays(10)
         ]);
     }
 }

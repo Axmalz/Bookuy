@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Notification;
+
 class CourierController extends Controller
 {
     public function index(Request $request)
@@ -34,6 +36,16 @@ class CourierController extends Controller
         $order->status = $request->status;
         $order->courier_message = $request->message;
         $order->save();
+
+        if ($request->status == 'Delivered') {
+            Notification::create([
+                'user_id' => $order->buyer_id, // Kirim ke pembeli
+                'title'   => 'Order Delivered!',
+                'message' => "Buku '{$order->book->judul_buku}' telah sampai di tujuan.",
+                'type'    => 'transaction',
+                'icon'    => 'icon-notif-truck.png'
+            ]);
+        }
 
         return back()->with('success', 'Status berhasil diperbarui!');
     }
