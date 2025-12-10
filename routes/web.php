@@ -148,3 +148,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
          ->name('notification.storeGlobal');
 
 });
+
+// Tambahkan Route Healthcheck ini di paling bawah
+Route::get('/up', function () {
+    return response('OK', 200);
+});
