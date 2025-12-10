@@ -19,8 +19,9 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 # 3. Enable Apache Rewrite
 RUN a2enmod rewrite
 
-# 4. Configure Apache Document Root
+# 4. Configure Apache Document Root & ServerName (Fix AH00558)
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
