@@ -1,67 +1,49 @@
-# Gunakan image PHP 8.2 resmi dengan Apache
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# 1. Install Dependencies (Gabungan dari temanmu & standar Laravel)
+# 1. Install dependencies sistem dan Node.js (Penting untuk Vite/Tailwind)
 RUN apt-get update && apt-get install -y \
     git \
     curl \
-    unzip \
-    zip \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    libzip-dev \
-    libsodium-dev \
-    libpq-dev \
-    default-mysql-client \
-    default-libmysqlclient-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_pgsql pdo_mysql mbstring exif pcntl bcmath gd zip sodium
+    zip \
+    unzip \
+    nodejs \
+    npm
 
-# 2. Install Node.js (Dari temanmu - Penting jika ada build step)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs
+# 2. Bersihkan cache apt
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 3. Enable Apache mod_rewrite (Wajib untuk Laravel)
-RUN a2enmod rewrite
+# 3. Install ekstensi PHP yang dibutuhkan Laravel
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# 4. Set direktori kerja
-WORKDIR /var/www/html
-
-# 5. Copy Composer
+# 4. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 6. Copy File Project
+# 5. Set direktori kerja
+WORKDIR /var/www/html
+
+# 6. Salin semua file project
 COPY . .
 
-# 7. Install PHP Dependencies (Production Mode)
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# 7. Install dependensi PHP (Composer)
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
-# 8. Install NPM Dependencies & Build (Jika pakai Vite)
-# (Opsional: Jika build gagal karena resource, bisa dihapus dan build lokal dulu)
-RUN npm install && npm run build
+# 8. Install dependensi JS dan Build Assets (Penting untuk Tailwind)
+RUN npm install
+RUN npm run build
 
-# 9. Set Permissions (Sangat Penting untuk Railway)
+# 9. Atur permission folder storage dan cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 10. Konfigurasi Apache (Agar root ke /public)
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+# 10. Salin dan set permission untuk script entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# 11. Allow .htaccess
-RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+# 11. Expose port (hanya untuk dokumentasi, Railway mengabaikan ini dan menyuntikkan $PORT)
+EXPOSE 8080
 
-# 12. PORT Handling (Kunci Anti-502 di Railway)
-# Mengganti port 80 default Apache dengan $PORT dari Railway (atau 8000)
-RUN sed -s -i -e "s/80/\${PORT:-8000}/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
-
-# 13. Expose & CMD
-EXPOSE 8000
-CMD php artisan config:cache && \
-    php artisan view:cache && \
-    php artisan migrate --force && \
-    apache2-foreground
+# 12. Jalankan script entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
