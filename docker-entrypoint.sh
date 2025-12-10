@@ -1,7 +1,7 @@
 #!/bin/bash
 set +e
 
-echo "🚀 Starting Application..."
+echo "🚀 Starting Application (Minimal Mode)..."
 
 # 1. Konfigurasi Port Apache
 if [ -z "$PORT" ]; then
@@ -13,12 +13,11 @@ sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:${PORT}>/g" /etc/apache2/sites-ava
 # 2. Fix Permission
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 3. Optimasi Laravel (PENTING: Jalankan di sini, bukan di Dockerfile)
-# Agar mengambil variabel environment yang BENAR dari Railway.
-echo "🔥 Optimizing Configuration..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# 3. HAPUS Optimasi Cache Sementara
+# Kita matikan dulu config:cache, route:cache, dll agar booting lebih aman & cepat.
+# Laravel akan membaca .env secara langsung.
+echo "⚠️ Skipping optimization commands to ensure stability..."
+php artisan optimize:clear
 
 # 4. Jalankan Apache
 echo "🔥 Starting Apache on port $PORT..."
