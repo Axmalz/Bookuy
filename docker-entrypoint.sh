@@ -1,19 +1,29 @@
 #!/bin/bash
 
-# Berhenti jika ada error
-set -e
+# Hapus "set -e" agar container tidak mati mendadak jika ada command gagal
+# set -e 
 
-# 1. Jalankan migrasi database otomatis (force untuk production)
+echo "🚀 Starting deployment process..."
+
+# 1. Jalankan migrasi database (Gunakan try/catch logic sederhana)
 echo "Running database migrations..."
 php artisan migrate --force
 
-# 2. Cache konfigurasi dan route untuk performa
+if [ $? -eq 0 ]; then
+    echo "✅ Migration successful."
+else
+    echo "⚠️ MIGRATION FAILED! Check your database credentials in Railway variables."
+    # Kita lanjut saja ke bawah agar server tetap nyala dan bisa menampilkan error log
+fi
+
+# 2. Optimasi Cache
 echo "Caching configuration..."
+php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
 # 3. Jalankan server Laravel
-# PENTING: Gunakan host 0.0.0.0 dan port dari environment variable $PORT
-echo "Starting Laravel server on port $PORT..."
+# Menggunakan PORT dari env variable Railway
+echo "🔥 Starting Laravel server on port $PORT..."
 php artisan serve --host=0.0.0.0 --port=$PORT
