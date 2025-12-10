@@ -50,13 +50,8 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN dos2unix /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# 12. RUN OPTIMIZATION HERE (Saat Build, bukan saat Start)
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
-
-# 13. Expose Port
+# 12. Expose Port
 EXPOSE 8080
 
-# 14. Start Container
+# 13. Start Container
 ENTRYPOINT ["docker-entrypoint.sh"]
