@@ -20,15 +20,18 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
+    /**
+     * Bootstrap any application services.
+     */
     public function boot(): void
     {
-        // Terapkan CartComposer ke semua view ('*')
-        // Ini membuat variabel $cartCount tersedia di semua halaman (header)
-        View::composer('*', CartComposer::class);
+        // FIX 502: Jangan gunakan '*' (wildcard) karena akan memicu query di view error/splash
+        // Hanya inject $cartCount ke layout utama yang dipakai user login
+        View::composer(['layouts.app-main', 'home', 'cart.index', 'product.*'], CartComposer::class);
 
-        // Paksa HTTPS di lingkungan Production (Railway)
-        //if ($this->app->environment('production')) {
-        //    URL::forceScheme('https');
-        //}
+        // Paksa HTTPS di Production (Railway)
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }

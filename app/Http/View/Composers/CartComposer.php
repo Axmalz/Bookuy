@@ -12,17 +12,16 @@ class CartComposer
     {
         $cartCount = 0;
 
-        if (Auth::check()) {
-            // Ambil keranjang user
-            $cart = Cart::where('user_id', Auth::id())->first();
-
-            if ($cart) {
-                // Hitung total item (beli + sewa)
-                // Jika ingin menghitung 'jenis' buku, gunakan count().
-                // Jika ingin menghitung total 'qty', gunakan sum('quantity').
-                // Biasanya badge keranjang menghitung jumlah jenis item.
-                $cartCount = $cart->items()->count();
+        try {
+            if (Auth::check()) {
+                $cart = Cart::where('user_id', Auth::id())->first();
+                if ($cart) {
+                    $cartCount = $cart->items()->count();
+                }
             }
+        } catch (\Exception $e) {
+            // Silent fail: Jika DB error, jangan crash halaman, cukup set cart 0
+            // Log::error("CartComposer Error: " . $e->getMessage());
         }
 
         $view->with('cartCount', $cartCount);
