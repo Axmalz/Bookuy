@@ -1,4 +1,4 @@
-# Gunakan PHP-FPM (Bukan Apache) - Jauh lebih ringan & stabil
+# Gunakan PHP-FPM
 FROM php:8.2-fpm
 
 # 1. Install Nginx & Dependencies
@@ -17,8 +17,15 @@ RUN apt-get update && apt-get install -y \
 # 2. Install PHP Extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# 3. Setup Nginx Configuration (Inject Config Langsung)
-# Kita buat konfigurasi server block Nginx yang support Laravel & Healthcheck
+# ==============================================================================
+# FIX 1: AKTIFKAN LOGGING NGINX KE CONSOLE (Agar Error 502 terlihat di Railway)
+# ==============================================================================
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+
+# ==============================================================================
+# FIX 2: KONFIGURASI NGINX DENGAN BUFFER LEBIH BESAR
+# ==============================================================================
 RUN echo 'server { \
     listen 8080 default_server; \
     root /var/www/html/public; \
@@ -30,15 +37,17 @@ RUN echo 'server { \
         try_files $uri $uri/ /index.php?$query_string; \
     } \
     \
-    # Handle PHP Scripts via FPM \
     location ~ \.php$ { \
         include fastcgi_params; \
         fastcgi_pass 127.0.0.1:9000; \
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name; \
         fastcgi_index index.php; \
+        # Tuning Buffer untuk mencegah 502 pada response besar \
+        fastcgi_buffers 16 16k; \
+        fastcgi_buffer_size 32k; \
+        fastcgi_read_timeout 300; \
     } \
     \
-    # Healthcheck Bypass khusus Railway \
     location /up/ { \
         alias /var/www/html/public/up/; \
         index index.html; \
@@ -62,17 +71,21 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-d
 RUN npm install
 RUN npm run build
 
-# 9. Permission Setting (Wajib untuk Nginx & Laravel)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# 9. Create PHP Check File (Manual Test)
+RUN echo "<?php echo 'PHP FPM is Working correctly. Version: ' . phpversion(); ?>" > /var/www/html/public/check.php
+
+# ==============================================================================
+# FIX 3: PERMISSION TOTAL (Chown Seluruh Project)
+# Kita berikan seluruh folder ke www-data agar tidak ada isu permission
+# ==============================================================================
+RUN chown -R www-data:www-data /var/www/html
 
 # 10. Copy & Prepare Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
-# Fix Windows line endings just in case
 RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# 11. Expose Port (Railway akan override ini, tapi standar 8080)
+# 11. Expose Port
 EXPOSE 8080
 
 # 12. Start Container
