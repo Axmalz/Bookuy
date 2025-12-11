@@ -16,41 +16,58 @@ RUN apt-get update && apt-get install -y \
 # 2. Install PHP Extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# 3. Configure Apache
+# 3. Configure Apache (CRITICAL FIX FOR 502 & .htaccess)
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Ubah Document Root ke folder public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+
+# PENTING: Izinkan .htaccess bekerja (Ubah AllowOverride None menjadi All)
+RUN sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf
+
+# Aktifkan mod_rewrite
 RUN a2enmod rewrite
 
-# 4. Install Composer
+# 4. Force PHP Logging to Stderr (Agar Error Laravel muncul di Railway Logs)
+RUN echo "log_errors = On" >> /usr/local/etc/php/conf.d/error-logging.ini \
+    && echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/error-logging.ini \
+    && echo "display_errors = Off" >> /usr/local/etc/php/conf.d/error-logging.ini \
+    && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/memory-limit.ini
+
+# 5. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 5. Set Working Directory
+# 6. Set Working Directory
 WORKDIR /var/www/html
 
-# 6. Copy Application Files
+# 7. Copy Application Files
 COPY . .
 
-# 7. Install PHP Dependencies
+# 8. Install PHP Dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
-# 8. Install Node Dependencies & Build Assets
+# 9. Install Node Dependencies & Build Assets
 RUN npm install
 RUN npm run build
 
-# 9. Permission Setting
+# 10. Permission Setting
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 10. Copy & Prepare Entrypoint
+# 11. Copy & Prepare Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
-# Pastikan format baris Unix (LF) dan executable
 RUN dos2unix /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# 11. Expose Port
+# 12. Fix Apache MPM (Clean Up)
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
+    && a2enmod mpm_prefork rewrite
+
+# 13. Expose Port
 EXPOSE 8080
 
-# 12. Start Container
+# 14. Start Container
 ENTRYPOINT ["docker-entrypoint.sh"]
