@@ -1,19 +1,5 @@
 <?php
 
-// DEBUG ROUTES (Letakkan di paling atas file)
-Route::get('/debug-php', function () {
-    return 'PHP is working correctly!';
-});
-
-Route::get('/debug-db', function () {
-    try {
-        \DB::connection()->getPdo();
-        return 'Database Connection OK: ' . \DB::connection()->getDatabaseName();
-    } catch (\Exception $e) {
-        return 'Database Error: ' . $e->getMessage();
-    }
-});
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController; // <-- IMPORT BARU
@@ -33,6 +19,19 @@ use App\Http\Controllers\ChatController;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+// DEBUG ROUTES (Letakkan di paling atas file)
+Route::get('/debug-php', function () {
+    return 'PHP OK: ' . phpversion();
+});
+Route::get('/debug-db', function () {
+    try {
+        \DB::connection()->getPdo();
+        return 'DB OK: ' . \DB::connection()->getDatabaseName();
+    } catch (\Exception $e) {
+        return 'DB ERROR: ' . $e->getMessage();
+    }
+});
 
 // ... Rute Splash dan Onboarding ...
 Route::get('/', function () { return view('splash'); });
