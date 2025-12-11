@@ -16,10 +16,11 @@ RUN apt-get update && apt-get install -y \
 # 2. Install PHP Extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# 3. Enable Apache Rewrite
-RUN a2enmod rewrite
+# 3. Enable Apache Rewrite & FIX MPM CONFLICT (PENTING!)
+# Kita matikan mpm_event dan mpm_worker, lalu paksa mpm_prefork
+RUN a2dismod mpm_event mpm_worker && a2enmod mpm_prefork rewrite
 
-# 4. Configure Apache Document Root & ServerName (Fix AH00558)
+# 4. Configure Apache Document Root & ServerName
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
@@ -47,6 +48,7 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # 11. Copy & Prepare Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
+# Pastikan line ending benar (LF) dan permission execute
 RUN dos2unix /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
