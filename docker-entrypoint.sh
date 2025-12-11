@@ -1,7 +1,7 @@
 #!/bin/bash
 set +e
 
-echo "--- 🚀 STARTING RAILWAY DEPLOYMENT (FINAL FIX) ---"
+echo "--- 🚀 STARTING RAILWAY DEPLOYMENT (DEBUG MODE) ---"
 
 # 1. Konfigurasi Port
 if [ -z "$PORT" ]; then
@@ -39,21 +39,19 @@ php artisan config:clear
 php artisan view:clear
 
 # ============================================================
-# 6. NUCLEAR FIX: HAPUS KONFLIK MPM SAAT RUNTIME
+# 6. DATABASE CONNECTION TEST (BARU)
 # ============================================================
-echo "🔧 Fixing Apache MPM Configuration (Runtime Force)..."
-# Hapus paksa symlink modul yang bikin crash
-rm -f /etc/apache2/mods-enabled/mpm_event.conf
-rm -f /etc/apache2/mods-enabled/mpm_event.load
-rm -f /etc/apache2/mods-enabled/mpm_worker.conf
-rm -f /etc/apache2/mods-enabled/mpm_worker.load
+echo "🔍 Testing Database Connection..."
+# Kita coba cek status migrasi. Jika DB error, ini akan timeout/error di log.
+php artisan migrate:status --timeout=10 || echo "❌ DATABASE CONNECTION FAILED! Check Variables."
 
-# Pastikan hanya prefork yang aktif (dibutuhkan PHP)
-# Kita aktifkan ulang untuk memastikan symlink-nya ada
-a2enmod mpm_prefork || true
-# ============================================================
+# 7. NUCLEAR FIX MPM
+echo "🔧 Fixing Apache MPM Configuration..."
+rm -f /etc/apache2/mods-enabled/mpm_*.load \
+    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
+    && a2enmod mpm_prefork rewrite || true
 
-# 7. Jalankan Apache
+# 8. Jalankan Apache
 echo "🔥 Server starting on port $PORT..."
 echo "👉 HEALTHCHECK PATH IS NOW A STATIC FILE AT: /up/"
 rm -f /var/run/apache2/apache2.pid
