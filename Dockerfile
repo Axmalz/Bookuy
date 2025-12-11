@@ -16,25 +16,27 @@ RUN apt-get update && apt-get install -y \
 # 2. Install PHP Extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# 3. Configure Apache (CRITICAL FIX FOR 502 & .htaccess)
+# 3. Configure Apache & RAM Tuning (FIX 502 OOM)
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-# Ubah Document Root ke folder public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
-
-# PENTING: Izinkan .htaccess bekerja (Ubah AllowOverride None menjadi All)
 RUN sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf
-
-# Aktifkan mod_rewrite
 RUN a2enmod rewrite
 
-# 4. Force PHP Logging to Stderr (Agar Error Laravel muncul di Railway Logs)
+# Batasi jumlah proses Apache agar tidak memakan RAM (Pencegahan Crash 502)
+RUN echo "<IfModule mpm_prefork_module>\n\
+    StartServers             2\n\
+    MinSpareServers          2\n\
+    MaxSpareServers          4\n\
+    MaxRequestWorkers        10\n\
+    MaxConnectionsPerChild   0\n\
+</IfModule>" > /etc/apache2/mods-enabled/mpm_prefork.conf
+
+# 4. PHP Configuration
 RUN echo "log_errors = On" >> /usr/local/etc/php/conf.d/error-logging.ini \
     && echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/error-logging.ini \
-    && echo "display_errors = Off" >> /usr/local/etc/php/conf.d/error-logging.ini \
-    && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/memory-limit.ini
+    && echo "memory_limit = 128M" >> /usr/local/etc/php/conf.d/memory-limit.ini
 
 # 5. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -61,13 +63,14 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN dos2unix /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# 12. Fix Apache MPM (Clean Up)
+# 12. DEBUG FILE (Untuk Cek Server vs Laravel)
+RUN echo "<?php echo '<h1>SERVER IS ALIVE</h1><p>PHP Version: ' . phpversion() . '</p>'; ?>" > /var/www/html/public/check.php
+
+# 13. Clean Up MPM
 RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
     && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
     && a2enmod mpm_prefork rewrite
 
-# 13. Expose Port
+# 14. Expose & Start
 EXPOSE 8080
-
-# 14. Start Container
 ENTRYPOINT ["docker-entrypoint.sh"]
