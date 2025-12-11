@@ -16,11 +16,12 @@ RUN apt-get update && apt-get install -y \
 # 2. Install PHP Extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# 3. Configure Apache Document Root & ServerName
+# 3. Configure Apache
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+RUN a2enmod rewrite
 
 # 4. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -44,17 +45,9 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # 10. Copy & Prepare Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
+# Pastikan format baris Unix (LF) dan executable
 RUN dos2unix /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-# ============================================================
-# SOLUSI TUNTAS MASALAH APACHE CRASH (AH00534)
-# Kita hapus SEMUA file konfigurasi MPM yang ada (Event/Worker/Prefork)
-# Lalu kita aktifkan HANYA mpm_prefork secara manual.
-# ============================================================
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork rewrite
 
 # 11. Expose Port
 EXPOSE 8080

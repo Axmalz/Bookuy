@@ -1,7 +1,7 @@
 #!/bin/bash
 set +e
 
-echo "--- 🚀 STARTING RAILWAY DEPLOYMENT (APACHE BYPASS FIX) ---"
+echo "--- 🚀 STARTING RAILWAY DEPLOYMENT (FINAL FIX) ---"
 
 # 1. Konfigurasi Port
 if [ -z "$PORT" ]; then
@@ -11,10 +11,7 @@ fi
 sed -i "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf
 sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:${PORT}>/g" /etc/apache2/sites-available/000-default.conf
 
-# 2. SOLUSI HEALTCHECK BYPASS (KUNCI UTAMA)
-# Kita buat file index.html kecil di folder public/up
-# Jadi ketika Railway akses /up, Apache langsung menyajikan file ini (Status 200)
-# tanpa melewati routing Laravel yang berpotensi error/404.
+# 2. SOLUSI HEALTHCHECK BYPASS
 echo "🚑 Creating Direct Apache Healthcheck..."
 mkdir -p /var/www/html/public/up
 echo "OK" > /var/www/html/public/up/index.html
@@ -41,7 +38,22 @@ php artisan route:clear
 php artisan config:clear
 php artisan view:clear
 
-# 6. Jalankan Apache
+# ============================================================
+# 6. NUCLEAR FIX: HAPUS KONFLIK MPM SAAT RUNTIME
+# ============================================================
+echo "🔧 Fixing Apache MPM Configuration (Runtime Force)..."
+# Hapus paksa symlink modul yang bikin crash
+rm -f /etc/apache2/mods-enabled/mpm_event.conf
+rm -f /etc/apache2/mods-enabled/mpm_event.load
+rm -f /etc/apache2/mods-enabled/mpm_worker.conf
+rm -f /etc/apache2/mods-enabled/mpm_worker.load
+
+# Pastikan hanya prefork yang aktif (dibutuhkan PHP)
+# Kita aktifkan ulang untuk memastikan symlink-nya ada
+a2enmod mpm_prefork || true
+# ============================================================
+
+# 7. Jalankan Apache
 echo "🔥 Server starting on port $PORT..."
 echo "👉 HEALTHCHECK PATH IS NOW A STATIC FILE AT: /up/"
 rm -f /var/run/apache2/apache2.pid
