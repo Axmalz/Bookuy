@@ -47,16 +47,17 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN dos2unix /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# 11. CRITICAL FIX: FORCE REMOVE CONFLICTING MPMs
-# Kita hapus manual file konfigurasi yang bikin crash, lalu aktifkan rewrite
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_event.conf \
-    && rm -f /etc/apache2/mods-enabled/mpm_worker.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_worker.conf \
+# ============================================================
+# SOLUSI TUNTAS MASALAH APACHE CRASH (AH00534)
+# Kita hapus SEMUA file konfigurasi MPM yang ada (Event/Worker/Prefork)
+# Lalu kita aktifkan HANYA mpm_prefork secara manual.
+# ============================================================
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
     && a2enmod mpm_prefork rewrite
 
-# 12. Expose Port
+# 11. Expose Port
 EXPOSE 8080
 
-# 13. Start Container
+# 12. Start Container
 ENTRYPOINT ["docker-entrypoint.sh"]
