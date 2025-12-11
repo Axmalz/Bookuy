@@ -1,7 +1,7 @@
 #!/bin/bash
 set +e
 
-echo "--- 🚀 STARTING RAILWAY DEPLOYMENT (DEBUG MODE) ---"
+echo "--- 🚀 STARTING RAILWAY DEPLOYMENT (DIAGNOSTIC MODE) ---"
 
 # 1. Konfigurasi Port
 if [ -z "$PORT" ]; then
@@ -16,7 +16,7 @@ echo "🚑 Creating Direct Apache Healthcheck..."
 mkdir -p /var/www/html/public/up
 echo "OK" > /var/www/html/public/up/index.html
 
-# 3. Pastikan Folder Ada & Permission Benar
+# 3. Setup Folder & Permission
 echo "📂 Fixing directory structure..."
 mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
@@ -31,28 +31,33 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate
 fi
 
-# 5. Link Storage & Bersihkan Cache
+# 5. Link Storage & Clear Cache
 php artisan storage:link || true
 echo "🧹 Clearing Caches..."
-php artisan route:clear
-php artisan config:clear
-php artisan view:clear
+php artisan optimize:clear
 
 # ============================================================
-# 6. DATABASE CONNECTION TEST (BARU)
+# 6. DATABASE CONNECTION TEST (FIXED)
 # ============================================================
 echo "🔍 Testing Database Connection..."
-# Kita coba cek status migrasi. Jika DB error, ini akan timeout/error di log.
-php artisan migrate:status --timeout=10 || echo "❌ DATABASE CONNECTION FAILED! Check Variables."
+# Kita pakai perintah PHP native untuk test koneksi agar lebih cepat & akurat
+php -r "
+try {
+    \$pdo = new PDO('mysql:host='.getenv('DB_HOST').';port='.getenv('DB_PORT').';dbname='.getenv('DB_DATABASE'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+    echo '✅ DATABASE CONNECTION SUCCESSFUL!'.PHP_EOL;
+} catch (PDOException \$e) {
+    echo '❌ DATABASE CONNECTION FAILED: ' . \$e->getMessage() . PHP_EOL;
+    // Kita tidak exit agar container tetap jalan untuk debug
+}
+"
 
-# 7. NUCLEAR FIX MPM
+# 7. NUCLEAR FIX MPM (Agar Apache tidak crash)
 echo "🔧 Fixing Apache MPM Configuration..."
 rm -f /etc/apache2/mods-enabled/mpm_*.load \
     && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
     && a2enmod mpm_prefork rewrite || true
 
-# 8. Jalankan Apache
+# 8. Start Server
 echo "🔥 Server starting on port $PORT..."
-echo "👉 HEALTHCHECK PATH IS NOW A STATIC FILE AT: /up/"
 rm -f /var/run/apache2/apache2.pid
 exec apache2-foreground
