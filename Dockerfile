@@ -1,7 +1,9 @@
-FROM php:8.2-apache
+# Gunakan PHP-FPM (Bukan Apache) - Jauh lebih ringan & stabil
+FROM php:8.2-fpm
 
-# 1. Install System Dependencies
+# 1. Install Nginx & Dependencies
 RUN apt-get update && apt-get install -y \
+    nginx \
     git \
     curl \
     libpng-dev \
@@ -10,20 +12,39 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     nodejs \
-    npm \
-    dos2unix
+    npm
 
-# 2. Install PHP Extensions (Standar & Stabil)
+# 2. Install PHP Extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# 3. Configure Apache Environment
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
-# Aktifkan .htaccess
-RUN sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf
-RUN a2enmod rewrite
+# 3. Setup Nginx Configuration (Inject Config Langsung)
+# Kita buat konfigurasi server block Nginx yang support Laravel & Healthcheck
+RUN echo 'server { \
+    listen 8080 default_server; \
+    root /var/www/html/public; \
+    index index.php index.html; \
+    server_name _; \
+    client_max_body_size 64M; \
+    \
+    location / { \
+        try_files $uri $uri/ /index.php?$query_string; \
+    } \
+    \
+    # Handle PHP Scripts via FPM \
+    location ~ \.php$ { \
+        include fastcgi_params; \
+        fastcgi_pass 127.0.0.1:9000; \
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \
+        fastcgi_index index.php; \
+    } \
+    \
+    # Healthcheck Bypass khusus Railway \
+    location /up/ { \
+        alias /var/www/html/public/up/; \
+        index index.html; \
+        access_log off; \
+    } \
+}' > /etc/nginx/sites-available/default
 
 # 4. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -31,32 +52,28 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # 5. Set Working Directory
 WORKDIR /var/www/html
 
-# 6. Copy Application Files (Sebagai Root dulu)
+# 6. Copy Application Files
 COPY . .
 
-# 7. Install Dependencies
+# 7. Install PHP Dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+# 8. Install Node Dependencies & Build Assets
 RUN npm install
 RUN npm run build
 
-# 8. PERMISSION FIX (KRUSIAL UNTUK MENGHINDARI 502)
-# Kita ubah kepemilikan SEMUA file ke www-data agar Apache punya akses penuh
-RUN chown -R www-data:www-data /var/www/html
-
-# 9. Create Check File (Testing Isolation)
-RUN echo "<?php echo '<h1>SERVER ALIVE</h1>'; phpinfo(); ?>" > /var/www/html/public/check.php \
-    && chown www-data:www-data /var/www/html/public/check.php
+# 9. Permission Setting (Wajib untuk Nginx & Laravel)
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # 10. Copy & Prepare Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN dos2unix /usr/local/bin/docker-entrypoint.sh
+# Fix Windows line endings just in case
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# 11. Fix Apache MPM (Hapus konflik modul)
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork rewrite
-
-# 12. Expose & Start
+# 11. Expose Port (Railway akan override ini, tapi standar 8080)
 EXPOSE 8080
+
+# 12. Start Container
 ENTRYPOINT ["docker-entrypoint.sh"]

@@ -1,60 +1,46 @@
 #!/bin/bash
 set +e
 
-echo "--- 🚀 STARTING RAILWAY DEPLOYMENT (PERMISSION FIXED) ---"
+echo "--- 🚀 STARTING RAILWAY DEPLOYMENT (NGINX + PHP-FPM) ---"
 
-# 1. Konfigurasi Port
+# 1. Konfigurasi Port Nginx Dinamis
 if [ -z "$PORT" ]; then
     echo "⚠️ PORT variable is empty! Defaulting to 8080."
     PORT=8080
 fi
-sed -i "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf
-sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:${PORT}>/g" /etc/apache2/sites-available/000-default.conf
+# Update port di config nginx sesuai environment Railway
+sed -i "s/listen 8080/listen ${PORT}/g" /etc/nginx/sites-available/default
+echo "✅ Nginx configured to listen on port $PORT"
 
-# 2. SOLUSI HEALTHCHECK BYPASS
-echo "🚑 Creating Direct Apache Healthcheck..."
+# 2. Setup Healthcheck Bypass
 mkdir -p /var/www/html/public/up
 echo "OK" > /var/www/html/public/up/index.html
-# Pastikan www-data bisa baca file ini
 chown -R www-data:www-data /var/www/html/public/up
 
-# 3. Setup Folder Cache (Tanpa Chown berat)
+# 3. Setup Folder & Permissions
 echo "📂 Fixing directory structure..."
 mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/bootstrap/cache
-# Set permission spesifik untuk folder yang butuh tulis
 chmod -R 777 /var/www/html/storage
 chmod -R 777 /var/www/html/bootstrap/cache
 
 # 4. Fail-Safe APP_KEY
 if [ -z "$APP_KEY" ]; then
-    echo "⚠️ APP_KEY is missing! Generating one automatically..."
     cp .env.example .env
     php artisan key:generate
 fi
 
-# 5. Link Storage & Cache
+# 5. Optimization
 php artisan storage:link || true
 php artisan optimize:clear
+# Optional: php artisan migrate --force (Hati-hati di production)
 
-# 6. Database Check (Kita simpan ini karena sangat membantu)
-echo "🔍 Testing Database Connection..."
-php -r "
-try {
-    \$pdo = new PDO('mysql:host='.getenv('DB_HOST').';port='.getenv('DB_PORT').';dbname='.getenv('DB_DATABASE'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
-    echo '✅ DATABASE CONNECTION SUCCESSFUL!'.PHP_EOL;
-} catch (PDOException \$e) {
-    echo '❌ DATABASE CONNECTION FAILED: ' . \$e->getMessage() . PHP_EOL;
-}
-"
+# 6. Start Services
+echo "🔥 Starting PHP-FPM..."
+# Jalankan PHP-FPM di background (Daemon)
+php-fpm -D
 
-# 7. MPM Safety Check
-rm -f /etc/apache2/mods-enabled/mpm_*.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork rewrite || true
-
-# 8. Start Apache
-echo "🔥 Server starting on port $PORT..."
-rm -f /var/run/apache2/apache2.pid
-exec apache2-foreground
+echo "🔥 Starting Nginx..."
+# Jalankan Nginx di foreground agar container tetap hidup
+nginx -g "daemon off;"
