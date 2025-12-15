@@ -14,32 +14,12 @@
     -->
     <div id="product-header" class="absolute top-0 left-0 w-full z-40 px-6 pt-14 pb-4 flex justify-between items-center transition-colors duration-300 pointer-events-none">
 
-        <!-- Logika Tombol Back -->
-        @php
-            $prevUrl = url()->previous();
-            $currentUrl = url()->current();
-
-            $avoidUrls = ['/cart', '/login', '/signup', '/register'];
-
-            $shouldGoHome = $prevUrl == $currentUrl;
-
-            if (!$shouldGoHome) {
-                foreach($avoidUrls as $urlPart) {
-                    if (str_contains($prevUrl, $urlPart)) {
-                        $shouldGoHome = true;
-                        break;
-                    }
-                }
-            }
-
-            $backLink = $shouldGoHome ? route('home') : $prevUrl;
-        @endphp
-
-        <a href="{{ $backLink }}" class="text-white drop-shadow-md hover:text-gray-200 transition-colors pointer-events-auto">
+        <!-- Tombol Back Dinamis -->
+        <button onclick="history.back()" class="text-white drop-shadow-md hover:text-gray-200 transition-colors pointer-events-auto">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-7 h-7">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
-        </a>
+        </button>
 
         <!-- Logo Tengah -->
         <img src="{{ asset('images/icon-bookuy-logo-white.png') }}" alt="Bookuy" class="h-16 w-auto drop-shadow-md pointer-events-auto">

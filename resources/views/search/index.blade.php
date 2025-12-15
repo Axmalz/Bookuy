@@ -12,16 +12,16 @@
     <!-- 1. Header Biru -->
     <div class="w-full bg-gradient-to-b from-blue-600 to-blue-500 px-6 pt-12 pb-6 rounded-b-[30px] shadow-md z-20 relative">
         <div class="flex items-center gap-3">
-            <!-- Tombol Kembali -->
-            @if($books !== null)
-                <a href="{{ route('search.index') }}" class="text-white flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
-                </a>
-            @else
-                <a href="{{ route('home') }}" class="text-white flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
-                </a>
-            @endif
+            <!--
+              Tombol Kembali (DIPERBAIKI)
+              Sekarang menggunakan javascript:history.back() agar dinamis
+              kembali ke halaman sebelumnya (Home atau Profile).
+            -->
+            <button onclick="history.back()" class="text-white flex-shrink-0 hover:text-gray-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
 
             <!-- Kolom Search -->
             <form id="main-search-form" action="{{ route('search.index') }}" method="GET" class="flex-grow">
@@ -91,6 +91,7 @@
                                 <div class="flex items-center gap-1 text-xs mt-1.5">
                                     <span class="font-bold text-yellow-500 text-sm">
                                         {{ number_format($book->reviews_avg_rating ?? 0, 1) }}
+                                        <!-- Fallback statis jika perlu: 4.8 -->
                                     </span>
                                     <span class="text-gray-300">|</span>
                                     <span class="text-gray-400 truncate">

@@ -12,11 +12,12 @@
     <!-- 1. Header Biru -->
     <div class="w-full bg-blue-600 pt-14 pb-5 rounded-b-[30px] shadow-md z-20 relative px-6 flex-shrink-0">
         <div class="relative flex flex-col items-center justify-center mb-2">
-            <a href="{{ route('profile.index') }}" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
+            <!-- Tombol Back Dinamis -->
+            <button onclick="history.back()" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
-            </a>
+            </button>
             <h1 class="font-sugo text-3xl text-white tracking-wide">Payment</h1>
         </div>
     </div>
@@ -110,11 +111,11 @@
         <div class="h-20 w-full"></div>
     </div>
 
-    <!-- 3. Tombol Apply -->
+    <!-- 3. Tombol Apply - DINAMIS -->
     <div class="absolute bottom-6 left-6 right-6 z-30">
-        <a href="{{ route('profile.index') }}" class="block w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full text-center shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
+        <button onclick="history.back()" class="block w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full text-center shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
             Apply
-        </a>
+        </button>
     </div>
 </div>
 

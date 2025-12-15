@@ -12,12 +12,39 @@
     <!-- 1. Header Biru -->
     <div class="w-full bg-blue-600 pt-14 pb-5 rounded-b-[30px] shadow-md z-20 relative px-6 flex-shrink-0">
         <div class="relative flex flex-col items-center justify-center mb-2">
-            <!-- Tombol Back (Ke Profile) -->
-            <a href="{{ route('profile.index') }}" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
-            </a>
+            <!--
+              LOGIKA PENCEGAHAN LOOP (ADDRESS)
+              Jika user kembali dari Add/Edit address (setelah redirect sukses),
+              tombol back jangan ke halaman form lagi.
+            -->
+            @php
+                $previousUrl = url()->previous();
+                $isFromForm = str_contains($previousUrl, 'address/create') || str_contains($previousUrl, 'address/edit');
+                $isSamePage = $previousUrl == url()->current();
+
+                if ($isFromForm || $isSamePage) {
+                    $backAction = 'href='.route('profile.index');
+                    $isButton = false;
+                } else {
+                    $backAction = 'onclick=history.back()';
+                    $isButton = true;
+                }
+            @endphp
+
+            @if($isButton)
+                <button {!! $backAction !!} class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+            @else
+                <a {!! $backAction !!} class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </a>
+            @endif
+
             <h1 class="font-sugo text-3xl text-white tracking-wide">Address</h1>
         </div>
     </div>
@@ -51,9 +78,7 @@
                             {{ $address->full_address }}
                         </p>
 
-                        <!-- Tombol Edit & Hapus (Muncul di semua alamat agar user bisa manage) -->
-                        <!-- DIEDIT: Tombol Edit & Delete sekarang muncul untuk semua item agar lebih mudah dikelola,
-                             tetapi tombol delete disabled untuk alamat default -->
+                        <!-- Tombol Edit & Hapus -->
                         <div class="flex items-center gap-4 mt-3">
                             <a href="{{ route('address.edit', $address->id) }}" class="text-blue-600 text-xs font-bold flex items-center gap-1 hover:underline">
                                 <img src="{{ asset('images/icon-edit-pencil.png') }}" class="w-3 h-3 mr-1"> Edit
@@ -63,13 +88,11 @@
                                 <form action="{{ route('address.destroy', $address->id) }}" method="POST" class="inline-block">
                                     @csrf
                                     @method('DELETE')
-                                    <!-- Menggunakan onclick sederhana untuk konfirmasi -->
                                     <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus alamat ini?')" class="text-red-500 text-xs font-bold flex items-center gap-1 hover:underline cursor-pointer">
                                         <img src="{{ asset('images/icon-trash-red.png') }}" class="w-3 h-3 mr-1"> Delete
                                     </button>
                                 </form>
                             @else
-                                <!-- Jika default, tombol delete disabled/hidden atau beri info -->
                                 <span class="text-gray-400 text-xs font-bold cursor-not-allowed" title="Ubah default ke alamat lain untuk menghapus">
                                     Delete
                                 </span>
@@ -78,7 +101,6 @@
                     </div>
 
                     <!-- Radio Button (Absolute Right) -->
-                    <!-- Klik radio untuk set default -->
                     <a href="{{ route('address.setDefault', $address->id) }}" class="absolute top-4 right-4">
                         <img src="{{ $address->is_default ? asset('images/icon-radio-active.png') : asset('images/icon-radio-inactive.png') }}"
                              class="w-6 h-6 cursor-pointer hover:scale-110 transition-transform">
@@ -110,11 +132,18 @@
         <div class="h-20 w-full"></div>
     </div>
 
-    <!-- 3. Tombol Apply (Bottom Fixed) -->
+    <!-- 3. Tombol Apply (Bottom Fixed) - DINAMIS -->
     <div class="absolute bottom-6 left-6 right-6 z-30">
-        <a href="{{ route('profile.index') }}" class="block w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full text-center shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
-            Apply
-        </a>
+        <!-- Juga menggunakan logika yang sama, jika loop, kembali ke profile -->
+        @if($isButton)
+            <button onclick="history.back()" class="block w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full text-center shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
+                Apply
+            </button>
+        @else
+            <a href="{{ route('profile.index') }}" class="block w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full text-center shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
+                Apply
+            </a>
+        @endif
     </div>
 </div>
 @endsection

@@ -12,11 +12,12 @@
     <!-- 1. Header Biru -->
     <div class="w-full bg-blue-600 pt-14 pb-5 rounded-b-[30px] shadow-md z-30 relative px-6 flex-shrink-0">
         <div class="relative flex flex-col items-center justify-center mb-2">
-            <a href="{{ route('payment.index') }}" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
+            <!-- Tombol Back Dinamis -->
+            <button onclick="history.back()" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
-            </a>
+            </button>
             <h1 class="font-sugo text-3xl text-white tracking-wide">New Card</h1>
         </div>
     </div>
@@ -64,9 +65,10 @@
             </div>
             <h2 class="text-2xl font-bold text-blue-900 mb-2">Congratulations!</h2>
             <p class="text-gray-500 text-sm mb-6">Your new card has been saved.</p>
-            <a href="{{ route('payment.index') }}" class="w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
+            <!-- Tombol Thanks Dinamis -->
+            <button onclick="history.back()" class="w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
                 Thanks
-            </a>
+            </button>
         </div>
     </div>
 </div>

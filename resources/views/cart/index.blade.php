@@ -12,11 +12,52 @@
     <!-- 1. Header Biru (Fixed) -->
     <div class="w-full bg-blue-600 pt-14 pb-5 rounded-b-[30px] shadow-md z-20 relative px-6 flex-shrink-0">
         <div class="relative flex flex-col items-center justify-center mb-5">
-            <a href="{{ $backUrl }}" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
-            </a>
+            <!--
+              LOGIKA PENCEGAHAN LOOP (REVISI)
+              Jika user kembali dari halaman Checkout (via link/redirect), history stack browser mungkin menjadi:
+              ... -> Produk -> Cart -> Checkout -> Cart (Current)
+
+              Jika kita pakai history.back(), user kembali ke Checkout (Loop).
+              Jika kita pakai history.go(-2), user kembali ke Cart (posisi sebelum checkout).
+              Dari sana, tombol back akan normal kembali ke Produk.
+
+              Fallback ke Home jika history.length tidak cukup atau script gagal.
+            -->
+            @php
+                $previousUrl = url()->previous();
+                $checkoutUrl = route('checkout.index');
+
+                $isFromCheckout = str_contains($previousUrl, 'checkout');
+                $isSamePage = $previousUrl == url()->current();
+
+                // Default logic
+                $backAttr = 'onclick="history.back()"';
+
+                if ($isFromCheckout) {
+                    // Jika dari checkout, coba mundur 2 langkah untuk melewati 'Checkout' dan kembali ke state Cart sebelumnya
+                    // Jika gagal (misal direct access), fallback ke Home via JS check
+                    $backAttr = 'onclick="if(history.length > 2) { history.go(-2); } else { window.location.href = \''.route('home').'\'; }"';
+                } elseif ($isSamePage) {
+                    $backAttr = 'href='.route('home');
+                }
+            @endphp
+
+            @if($isSamePage)
+                <!-- Jika refresh halaman sendiri, link statis ke home -->
+                <a {!! $backAttr !!} class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </a>
+            @else
+                <!-- Tombol dengan JS History -->
+                <button {!! $backAttr !!} class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+            @endif
+
             <h1 class="font-sugo text-3xl text-white tracking-wide">Keranjang</h1>
         </div>
 

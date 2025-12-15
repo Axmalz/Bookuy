@@ -10,7 +10,11 @@
 <div class="w-full h-full flex flex-col bg-white">
     <!-- Header -->
     <div class="bg-blue-600 pt-12 pb-5 rounded-b-[30px] shadow-lg px-6 flex items-center gap-4 z-20">
-        <a href="{{ route('chat.index') }}" class="text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></a>
+        <!-- Tombol Back Dinamis -->
+        <button onclick="history.back()" class="text-white hover:text-gray-200 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+
         <div class="w-10 h-10 rounded-full bg-white/20 overflow-hidden">
             <img src="{{ $partner->profile_photo_path ? asset('storage/'.$partner->profile_photo_path) : 'https://ui-avatars.com/api/?name='.urlencode($partner->name) }}" class="w-full h-full object-cover">
         </div>

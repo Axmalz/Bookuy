@@ -40,7 +40,7 @@
                     </div>
                 </div>
             @else
-                <a href="{{ route('address.create') }}" class="block w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-center text-gray-400 text-sm font-bold hover:border-blue-500 hover:text-blue-500 transition-colors">
+                <a href="{{ route('address.index') }}" class="block w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-center text-gray-400 text-sm font-bold hover:border-blue-500 hover:text-blue-500 transition-colors">
                     + Add Address
                 </a>
             @endif

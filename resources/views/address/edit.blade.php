@@ -12,11 +12,12 @@
     <!-- 1. Header Biru -->
     <div class="w-full bg-blue-600 pt-14 pb-5 rounded-b-[30px] shadow-md z-30 relative px-6 flex-shrink-0">
         <div class="relative flex flex-col items-center justify-center mb-2">
-            <a href="{{ route('address.index') }}" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
+            <!-- Tombol Back Dinamis -->
+            <button onclick="history.back()" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
-            </a>
+            </button>
             <h1 class="font-sugo text-3xl text-white tracking-wide">Edit Address</h1>
         </div>
     </div>
@@ -37,9 +38,10 @@
         <div class="w-full flex justify-center pt-3 pb-1"><div class="w-10 h-1 bg-gray-300 rounded-full"></div></div>
         <div class="px-6 flex justify-between items-center mb-2">
             <h3 class="text-lg font-bold text-blue-900">Edit Address</h3>
-            <a href="{{ route('address.index') }}" class="p-2 text-gray-400 hover:text-gray-800">
+            <!-- Tombol Tutup (Back juga) -->
+            <button onclick="history.back()" class="p-2 text-gray-400 hover:text-gray-800">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </a>
+            </button>
         </div>
 
         <div class="px-6 pb-8 pt-2">
@@ -76,9 +78,11 @@
             </div>
             <h2 class="text-2xl font-bold text-blue-900 mb-2">Updated!</h2>
             <p class="text-gray-500 text-sm mb-6">Your address has been updated.</p>
-            <a href="{{ route('address.index') }}" class="w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
+
+            <!-- Tombol Back to List Dinamis -->
+            <button onclick="history.back()" class="w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full shadow-lg hover:bg-blue-700 transition-transform active:scale-95">
                 Back to List
-            </a>
+            </button>
         </div>
     </div>
 </div>
