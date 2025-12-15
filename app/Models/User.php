@@ -1,5 +1,11 @@
 <?php
 
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+
 namespace App\Models;
 
 // Hapus atau comment use Notifiable jika tidak pakai fitur notifikasi bawaan Laravel via email/dll

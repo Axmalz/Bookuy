@@ -1,5 +1,11 @@
 <?php
 
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -18,10 +24,10 @@ class NotificationController extends Controller
         $allNotifications = $user->notifications()->latest()->get();
 
         // Kelompokkan data
+        // Kita inisialisasi agar urutannya tetap: Today, lalu Yesterday, lalu Tanggal Lain
         $groups = [
             'Today' => [],
             'Yesterday' => [],
-            'Older' => [] // Akan diganti tanggal spesifik di View logic jika mau, atau dikelompokkan per tanggal
         ];
 
         foreach ($allNotifications as $notif) {
@@ -30,16 +36,22 @@ class NotificationController extends Controller
             } elseif ($notif->created_at->isYesterday()) {
                 $groups['Yesterday'][] = $notif;
             } else {
-                // Kelompokkan berdasarkan format tanggal 'May 7, 2025'
+                // Kelompokkan berdasarkan format tanggal, misal 'May 7, 2025'
                 $dateKey = $notif->created_at->format('F j, Y');
                 $groups[$dateKey][] = $notif;
             }
         }
 
-        // Hapus array kosong di 'Older' jika kita menggunakan struktur dinamis di atas
-        // Logika di atas sudah otomatis membuat key baru untuk tanggal lama.
-        // Hapus key 'Older' inisial jika tidak dipakai
-        unset($groups['Older']);
+        // --- BAGIAN INI DIPERBAIKI ---
+        // Hapus key 'Today' dan 'Yesterday' jika kosong agar judulnya tidak muncul di view
+        if (empty($groups['Today'])) {
+            unset($groups['Today']);
+        }
+
+        if (empty($groups['Yesterday'])) {
+            unset($groups['Yesterday']);
+        }
+        // -----------------------------
 
         return view('notification.index', compact('groups'));
     }

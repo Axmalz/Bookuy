@@ -1,5 +1,11 @@
 @extends('layouts.app')
-
+<!--
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+-->
 @section('content')
 <div class="min-h-screen bg-gray-50 font-sans">
 

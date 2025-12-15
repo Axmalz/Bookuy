@@ -1,5 +1,11 @@
 @extends('layouts.app-main')
-
+<!--
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+-->
 @section('main-content')
 
 <!-- FIX: Override CSS untuk menghilangkan blok putih / padding berlebih -->
@@ -102,7 +108,10 @@
                         <p class="text-xs text-gray-400">History Penjualanmu</p>
                     </div>
                 </div>
-                <div class="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">1</div>
+                <!-- Indikator Sales History: Hitung order di mana user ini adalah penjual (seller_id) -->
+                <div class="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {{ \App\Models\Order::where('seller_id', Auth::id())->count() }}
+                </div>
             </a>
 
             <!-- Purchase History Item -->
@@ -116,7 +125,10 @@
                         <p class="text-xs text-gray-400">Leave a review!</p>
                     </div>
                 </div>
-                <div class="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">1</div>
+                <!-- Indikator Purchase History: Hitung order di mana user ini adalah pembeli (buyer_id) -->
+                <div class="bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {{ \App\Models\Order::where('buyer_id', Auth::id())->count() }}
+                </div>
             </a>
         </div>
 

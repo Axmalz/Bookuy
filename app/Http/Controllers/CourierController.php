@@ -1,5 +1,11 @@
 <?php
 
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;

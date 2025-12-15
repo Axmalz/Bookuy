@@ -1,5 +1,11 @@
 <?php
 
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController; // <-- IMPORT BARU
@@ -22,10 +28,10 @@ use App\Http\Controllers\ChatController;
 
 // ... Rute Splash dan Onboarding ...
 Route::get('/', function () { return view('splash'); });
-Route::get('/welcome', function () { return view('onboarding.1'); }); // <-- Ganti welcome ke onboarding 1
-Route::get('/onboarding/1', function () { return view('onboarding.1'); });
-Route::get('/onboarding/2', function () { return view('onboarding.2'); });
-Route::get('/onboarding/3', function () { return view('onboarding.3'); });
+Route::get('/onboarding', function () { return view('onboarding.1'); }); // <-- Ganti rute menjadi /onboarding
+// Route::get('/onboarding/1', function () { return view('onboarding.1'); }); // Hapus rute lama jika tidak diperlukan
+// Route::get('/onboarding/2', function () { return view('onboarding.2'); }); // Hapus rute lama
+// Route::get('/onboarding/3', function () { return view('onboarding.3'); }); // Hapus rute lama
 
 // ... Rute Auth (SignUp, Login, Logout) ...
 Route::get('/signup', [AuthController::class, 'showRegisterForm'])->name('register.form');

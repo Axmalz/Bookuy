@@ -1,5 +1,11 @@
 <?php
 
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;

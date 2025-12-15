@@ -1,5 +1,11 @@
 @extends('layouts.app')
-
+<!--
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+-->
 <!--
   File layout BARU ini adalah perpanjangan dari layouts.app
   Tujuannya HANYA untuk menambahkan Navigation Bar.

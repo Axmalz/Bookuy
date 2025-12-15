@@ -1,5 +1,11 @@
 @extends('layouts.app-main') <!-- DIUBAH: Menggunakan app-main agar ada navbar -->
-
+<!--
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+-->
 @section('main-content') <!-- DIUBAH: Mengisi section 'main-content' milik app-main -->
 
 <!-- FIX: Override CSS untuk menghilangkan blok putih -->

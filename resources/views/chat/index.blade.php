@@ -1,5 +1,11 @@
 @extends('layouts.app-main')
-
+<!--
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+-->
 @section('main-content')
 <div class="w-full h-full bg-blue-600 flex flex-col relative overflow-hidden">
 

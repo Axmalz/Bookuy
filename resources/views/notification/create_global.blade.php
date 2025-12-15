@@ -1,5 +1,11 @@
 @extends('layouts.app-main')
-
+<!--
+// Kode ditulis oleh :
+// Nama  : Fadhiil Akmal Hamizan
+// Github: Axmalz
+// NRP   : 5026231128
+// Kelas : PPPL B
+-->
 @section('main-content')
 <div class="w-full bg-white relative pb-20">
     <div class="bg-blue-600 pt-14 pb-8 px-6 rounded-b-[40px] shadow-lg mb-6">
