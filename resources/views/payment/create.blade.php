@@ -23,7 +23,7 @@
     </div>
 
     <!-- 2. Form Content -->
-    <div class="flex-grow overflow-y-auto px-6 pt-8 pb-10 relative z-0">
+    <div class="flex-grow overflow-y-auto px-6 pt-8 pb-32 relative z-0">
         <h2 class="font-bold text-gray-900 text-lg mb-6">Add Debit or Credit Card</h2>
 
         <form id="card-form">
@@ -33,6 +33,7 @@
             <div class="mb-5">
                 <label class="block text-sm font-bold text-gray-800 mb-2">Card Number</label>
                 <input type="text" id="card_number" name="card_number" placeholder="Enter your card number" maxlength="16" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors tracking-wider">
+                <p class="text-xs text-gray-400 mt-1 ml-1">Must be 16 digits number</p>
             </div>
 
             <div class="flex gap-4 mb-8">
@@ -40,6 +41,7 @@
                 <div class="flex-1">
                     <label class="block text-sm font-bold text-gray-800 mb-2">Expiry Date</label>
                     <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/YY" maxlength="5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors">
+                    <p class="text-xs text-gray-400 mt-1 ml-1">Format: MM/YY</p>
                 </div>
                 <!-- Security Code -->
                 <div class="flex-1 relative">
@@ -47,14 +49,20 @@
                     <input type="text" id="cvc" name="cvc" placeholder="CVC" maxlength="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors">
                     <!-- Icon Help -->
                     <img src="{{ asset('images/icon-help.png') }}" class="absolute right-3 top-[38px] w-5 h-5 opacity-50">
+                    <p class="text-xs text-gray-400 mt-1 ml-1">3 digits on back</p>
                 </div>
             </div>
 
-            <!-- Add Card Button -->
-            <button type="submit" id="submit-btn" disabled class="w-full bg-gray-300 text-white font-bold text-lg py-3.5 rounded-full shadow-none cursor-not-allowed transition-all duration-300 mt-auto">
-                Add Card
-            </button>
+            <!-- Add Card Button (Moved to bottom via absolute positioning in parent container or just placed here if flex-col is used correctly, but user asked for 'at the bottom of the page') -->
+             <!-- We will use a fixed bottom container to ensure it's always at the bottom like other pages -->
         </form>
+    </div>
+
+    <!-- 3. Tombol Add Card (Bottom Fixed) -->
+    <div class="absolute bottom-6 left-6 right-6 z-30">
+        <button type="submit" form="card-form" id="submit-btn" disabled class="w-full bg-gray-300 text-white font-bold text-lg py-3.5 rounded-full shadow-none cursor-not-allowed transition-all duration-300">
+            Add Card
+        </button>
     </div>
 
     <!-- Success Modal -->
@@ -83,7 +91,20 @@
     // Validation Logic
     function checkInputs() {
         const allFilled = inputs.every(input => input.value.trim() !== '');
-        if (allFilled) {
+
+        // Tambahan validasi panjang karakter (opsional, tapi disarankan)
+        const cardNumber = document.getElementById('card_number').value.replace(/\D/g, '');
+        const expiryDate = document.getElementById('expiry_date').value;
+        const cvc = document.getElementById('cvc').value.replace(/\D/g, '');
+
+        // Regex sederhana untuk MM/YY
+        const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+
+        const isCardValid = cardNumber.length === 16;
+        const isExpiryValid = expiryRegex.test(expiryDate);
+        const isCvcValid = cvc.length === 3;
+
+        if (allFilled && isCardValid && isExpiryValid && isCvcValid) {
             submitBtn.disabled = false;
             submitBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
             submitBtn.classList.add('bg-blue-600', 'shadow-lg', 'hover:bg-blue-700', 'active:scale-95');
@@ -93,7 +114,26 @@
             submitBtn.classList.remove('bg-blue-600', 'shadow-lg', 'hover:bg-blue-700', 'active:scale-95');
         }
     }
-    inputs.forEach(input => input.addEventListener('input', checkInputs));
+
+    // Format input MM/YY otomatis
+    document.getElementById('expiry_date').addEventListener('input', function(e) {
+        let input = e.target.value.replace(/\D/g, ''); // Hanya angka
+        if (input.length > 2) {
+            input = input.substring(0, 2) + '/' + input.substring(2, 4);
+        }
+        e.target.value = input;
+        checkInputs();
+    });
+
+    // Hanya angka untuk Card Number dan CVC
+    document.getElementById('card_number').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+        checkInputs();
+    });
+    document.getElementById('cvc').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+        checkInputs();
+    });
 
     // Form Submit AJAX
     form.addEventListener('submit', function(e) {

@@ -83,7 +83,19 @@
                 @foreach($recommendedBooks as $book)
                 <a href="{{ route('product.show', $book->id) }}" class="flex-shrink-0 w-32 group">
                     <div class="w-full aspect-[9/16] bg-gray-200 rounded-lg overflow-hidden shadow-sm border border-transparent group-hover:border-blue-300 group-hover:shadow-md transition-all duration-300 relative">
-                        <img src="{{ isset($book->gambar_buku[0]) ? $book->gambar_buku[0] : '' }}" alt="{{ $book->judul_buku }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <!-- PERBAIKAN LOGIKA GAMBAR -->
+                        @php
+                            $imgSrc = '';
+                            if (isset($book->gambar_buku[0])) {
+                                $img = $book->gambar_buku[0];
+                                if (Str::startsWith($img, 'http')) {
+                                    $imgSrc = $img;
+                                } else {
+                                    $imgSrc = asset('storage/' . $img);
+                                }
+                            }
+                        @endphp
+                        <img src="{{ $imgSrc }}" alt="{{ $book->judul_buku }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                     </div>
                 </a>
@@ -109,7 +121,19 @@
                     <div class="flex gap-3">
                         <a href="{{ route('product.show', $book->id) }}" class="flex-shrink-0 w-20 h-28 overflow-hidden rounded-lg relative">
                             <div class="w-full h-full bg-gray-200">
-                                <img src="{{ isset($book->gambar_buku[0]) ? $book->gambar_buku[0] : '' }}" alt="{{ $book->judul_buku }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                <!-- PERBAIKAN LOGIKA GAMBAR -->
+                                @php
+                                    $imgSrc = '';
+                                    if (isset($book->gambar_buku[0])) {
+                                        $img = $book->gambar_buku[0];
+                                        if (Str::startsWith($img, 'http')) {
+                                            $imgSrc = $img;
+                                        } else {
+                                            $imgSrc = asset('storage/' . $img);
+                                        }
+                                    }
+                                @endphp
+                                <img src="{{ $imgSrc }}" alt="{{ $book->judul_buku }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             </div>
                         </a>
 

@@ -93,8 +93,19 @@
 
                     <!-- Gambar -->
                     <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 relative">
-                         <img src="{{ isset($item->book->gambar_buku[0]) ? $item->book->gambar_buku[0] : '' }}"
-                             class="w-full h-full object-cover absolute inset-0">
+                        <!-- PERBAIKAN LOGIKA GAMBAR -->
+                        @php
+                            $imgSrc = '';
+                            if (isset($item->book->gambar_buku[0])) {
+                                $img = $item->book->gambar_buku[0];
+                                if (Illuminate\Support\Str::startsWith($img, 'http')) {
+                                    $imgSrc = $img;
+                                } else {
+                                    $imgSrc = asset('storage/' . $img);
+                                }
+                            }
+                        @endphp
+                        <img src="{{ $imgSrc }}" class="w-full h-full object-cover absolute inset-0" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                     </div>
 
                     <!-- Detail Info -->

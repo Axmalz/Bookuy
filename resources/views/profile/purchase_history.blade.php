@@ -16,7 +16,7 @@
         <div class="relative flex flex-col items-center justify-center mb-6">
             <!-- Tombol Back -->
             <a href="{{ route('profile.index') }}" class="absolute left-0 top-1 text-white hover:text-gray-200 transition-colors">
-                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
             </a>
@@ -64,9 +64,20 @@
                         <!-- Foto Buku -->
                         <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                             @php
-                                $gambar = is_array($order->book->gambar_buku) ? ($order->book->gambar_buku[0] ?? '') : $order->book->gambar_buku;
+                                $imgSrc = '';
+                                if ($order->book) {
+                                    // Ambil gambar pertama jika array, atau string langsung
+                                    $img = is_array($order->book->gambar_buku) ? ($order->book->gambar_buku[0] ?? '') : $order->book->gambar_buku;
+
+                                    // Cek apakah URL eksternal atau path lokal
+                                    if (Illuminate\Support\Str::startsWith($img, 'http')) {
+                                        $imgSrc = $img;
+                                    } else {
+                                        $imgSrc = asset('storage/' . $img);
+                                    }
+                                }
                             @endphp
-                            <img src="{{ $gambar }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+                            <img src="{{ $imgSrc }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                         </div>
 
                         <!-- Detail Info -->

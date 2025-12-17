@@ -51,7 +51,12 @@
 
                 @foreach($book->gambar_buku as $index => $img)
                 <div class="carousel-item absolute transition-all duration-500 ease-out shadow-2xl rounded-lg overflow-hidden bg-gray-200" data-index="{{ $index }}">
-                    <img src="{{ $img }}" class="w-full h-full object-cover">
+                    <!-- LOGIKA GAMBAR DIPERBAIKI -->
+                    @if(Str::startsWith($img, 'http'))
+                        <img src="{{ $img }}" class="w-full h-full object-cover">
+                    @else
+                        <img src="{{ asset('storage/' . $img) }}" class="w-full h-full object-cover">
+                    @endif
                     <div class="blur-layer absolute inset-0 bg-white/30 backdrop-blur-[2px] opacity-0 transition-opacity duration-500"></div>
                 </div>
                 @endforeach
@@ -260,7 +265,7 @@
 
             <div id="modal-content-confirm" class="px-6 pb-8 overflow-y-auto">
                 <div class="flex gap-4 mb-6">
-                    <img src="{{ isset($book->gambar_buku[0]) ? $book->gambar_buku[0] : '' }}" class="w-24 h-24 rounded-xl object-cover shadow-md flex-shrink-0">
+                    <img src="{{ isset($book->gambar_buku[0]) ? (Str::startsWith($book->gambar_buku[0], 'http') ? $book->gambar_buku[0] : asset('storage/' . $book->gambar_buku[0])) : '' }}" class="w-24 h-24 rounded-xl object-cover shadow-md flex-shrink-0">
                     <div class="flex-grow min-w-0">
                         <h3 class="font-bold text-lg leading-tight mb-1 truncate">{{ $book->judul_buku }}</h3>
                         <p class="text-xs text-gray-500 mb-2">{{ $book->nama_penulis }}</p>

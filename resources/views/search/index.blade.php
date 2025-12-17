@@ -77,7 +77,19 @@
                         <div class="flex gap-3">
                             <a href="{{ route('product.show', $book->id) }}" class="flex-shrink-0 w-20 h-28 overflow-hidden rounded-lg relative">
                                 <div class="w-full h-full bg-gray-200">
-                                    <img src="{{ isset($book->gambar_buku[0]) ? $book->gambar_buku[0] : '' }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <!-- PERBAIKAN LOGIKA GAMBAR -->
+                                    @php
+                                        $imgSrc = '';
+                                        if (isset($book->gambar_buku[0])) {
+                                            $img = $book->gambar_buku[0];
+                                            if (Str::startsWith($img, 'http')) {
+                                                $imgSrc = $img;
+                                            } else {
+                                                $imgSrc = asset('storage/' . $img);
+                                            }
+                                        }
+                                    @endphp
+                                    <img src="{{ $imgSrc }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                 </div>
                             </a>
 

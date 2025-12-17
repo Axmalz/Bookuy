@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div class="flex-grow overflow-y-auto px-6 pt-8 pb-10 relative z-0">
+    <div class="flex-grow overflow-y-auto px-6 pt-8 pb-32 relative z-0">
         <h2 class="font-bold text-gray-900 text-lg mb-6">Edit Debit or Credit Card</h2>
 
         <form id="card-form">
@@ -29,24 +29,30 @@
             <div class="mb-5">
                 <label class="block text-sm font-bold text-gray-800 mb-2">Card Number</label>
                 <input type="text" id="card_number" name="card_number" value="{{ $card->card_number }}" maxlength="16" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors tracking-wider">
+                <p class="text-xs text-gray-400 mt-1 ml-1">Must be 16 digits number</p>
             </div>
 
             <div class="flex gap-4 mb-8">
                 <div class="flex-1">
                     <label class="block text-sm font-bold text-gray-800 mb-2">Expiry Date</label>
                     <input type="text" id="expiry_date" name="expiry_date" value="{{ $card->expiry_date }}" maxlength="5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors">
+                    <p class="text-xs text-gray-400 mt-1 ml-1">Format: MM/YY</p>
                 </div>
                 <div class="flex-1 relative">
                     <label class="block text-sm font-bold text-gray-800 mb-2">Security Code</label>
                     <input type="text" id="cvc" name="cvc" value="{{ $card->cvc }}" maxlength="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors">
                     <img src="{{ asset('images/icon-help.png') }}" class="absolute right-3 top-[38px] w-5 h-5 opacity-50">
+                    <p class="text-xs text-gray-400 mt-1 ml-1">3 digits on back</p>
                 </div>
             </div>
-
-            <button type="submit" id="submit-btn" class="w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 mt-auto active:scale-95">
-                Update Card
-            </button>
         </form>
+    </div>
+
+    <!-- Tombol Update Card (Bottom Fixed) -->
+    <div class="absolute bottom-6 left-6 right-6 z-30">
+        <button type="submit" form="card-form" id="submit-btn" class="w-full bg-blue-600 text-white font-bold text-lg py-3.5 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 active:scale-95">
+            Update Card
+        </button>
     </div>
 
     <div id="success-modal" class="absolute inset-0 z-50 bg-black/60 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
@@ -68,6 +74,23 @@
     const form = document.getElementById('card-form');
     const successModal = document.getElementById('success-modal');
     const successContent = document.getElementById('success-content');
+
+    // Format input MM/YY otomatis
+    document.getElementById('expiry_date').addEventListener('input', function(e) {
+        let input = e.target.value.replace(/\D/g, ''); // Hanya angka
+        if (input.length > 2) {
+            input = input.substring(0, 2) + '/' + input.substring(2, 4);
+        }
+        e.target.value = input;
+    });
+
+    // Hanya angka untuk Card Number dan CVC
+    document.getElementById('card_number').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+    });
+    document.getElementById('cvc').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+    });
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();

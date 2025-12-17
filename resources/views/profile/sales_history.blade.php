@@ -63,8 +63,19 @@
                     <div class="flex gap-4">
                         <!-- Foto Buku -->
                         <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
-                            <img src="{{ isset($order->book->gambar_buku[0]) ? $order->book->gambar_buku[0] : '' }}"
-                                 class="w-full h-full object-cover">
+                            @php
+                                $imgSrc = '';
+                                if ($order->book) {
+                                    $img = is_array($order->book->gambar_buku) ? ($order->book->gambar_buku[0] ?? '') : $order->book->gambar_buku;
+
+                                    if (Illuminate\Support\Str::startsWith($img, 'http')) {
+                                        $imgSrc = $img;
+                                    } else {
+                                        $imgSrc = asset('storage/' . $img);
+                                    }
+                                }
+                            @endphp
+                            <img src="{{ $imgSrc }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                         </div>
 
                         <!-- Detail Info -->
@@ -85,20 +96,12 @@
                             <div class="text-blue-600 font-bold text-base">
                                 Rp {{ number_format($order->price, 0, ',', '.') }}
                             </div>
-
-                            <!-- Rating (Hanya di Completed) -->
-                            @if($tab == 'completed' && $order->rating)
-                            <div class="flex items-center gap-1 mt-1">
-                                <img src="{{ asset('images/icon-star-full.png') }}" class="w-3 h-3">
-                                <span class="text-xs font-bold text-gray-600">{{ $order->rating }}/5</span>
-                            </div>
-                            @endif
                         </div>
                     </div>
 
                     <!-- Tombol Track Order (Hanya di Ongoing) -->
                     @if($tab == 'ongoing')
-                    <div class="flex justify-end mt-3">
+                    <div class="flex justify-end mt-3 border-t border-gray-50 pt-3">
                         <!-- Placeholder Link -->
                         <a href="{{ route('order.track', $order->id) }}" class="bg-blue-600 text-white text-xs font-bold px-6 py-2 rounded-full shadow-md hover:bg-blue-700 transition-colors">
                             Track Order
