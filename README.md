@@ -1,130 +1,143 @@
-## Tentang Bookuy
+# 📚 Bookuy
 
-Bookuy adalah platform inovatif yang dirancang khusus untuk mahasiswa guna memfasilitasi jual-beli dan penyewaan buku bekas. Aplikasi ini bertujuan untuk membuat buku pelajaran lebih terjangkau dan mudah diakses, sekaligus mengurangi limbah kertas dengan mendorong penggunaan kembali buku.
+![Bookuy Banner](public/images/logo-color-full.png)
 
-Kami percaya bahwa pendidikan harus dapat diakses oleh semua orang, dan Bookuy hadir untuk menjembatani kesenjangan antara mahasiswa yang membutuhkan buku dengan mereka yang memiliki buku yang tidak lagi digunakan.
+> **Platform Jual-Beli & Penyewaan Buku Bekas Khusus Mahasiswa**
 
-## Fitur Utama
+[![Laravel](https://img.shields.io/badge/Laravel-12.0-red?style=flat&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat&logo=php)](https://php.net)
 
-Bookuy hadir dengan serangkaian fitur yang dirancang untuk memberikan pengalaman pengguna yang mulus dan intuitif:
+## 📖 Tentang Bookuy
 
-- Jual & Sewa Buku: Pengguna dapat memilih untuk membeli buku secara permanen atau menyewanya untuk jangka waktu tertentu (semester).
+**Bookuy** adalah solusi inovatif untuk ekosistem akademik yang lebih hemat dan ramah lingkungan. Aplikasi ini menjembatani kesenjangan antara mahasiswa yang memiliki buku tak terpakai dengan mereka yang membutuhkannya.
 
-- Pencarian & Filter Canggih: Temukan buku dengan cepat berdasarkan judul, penulis, atau kategori. Gunakan filter harga, kondisi, dan semester untuk hasil yang lebih spesifik.
+Kami percaya pendidikan harus dapat diakses oleh semua orang. Dengan fitur **Jual-Beli** dan **Sewa**, Bookuy tidak hanya membuat literatur lebih terjangkau, tetapi juga mendukung gerakan *go-green* dengan mengurangi limbah kertas melalui penggunaan kembali buku.
 
-- Desain Mobile-First: Antarmuka pengguna yang dioptimalkan untuk perangkat mobile, memberikan pengalaman seperti aplikasi native.
+---
 
-- Sistem Rating & Review: Transparansi kualitas buku dan reputasi penjual melalui sistem ulasan yang komprehensif.
+## 🚀 Fitur Utama
 
-- Keranjang Belanja: Kelola buku yang ingin dibeli atau disewa dalam satu tempat sebelum checkout.
+Bookuy dirancang dengan pendekatan *user-centric* untuk memberikan pengalaman terbaik:
 
-- Manajemen Profil: Atur informasi pribadi dan riwayat transaksi.
+### 🛒 Transaksi Fleksibel
+* **Jual & Beli:** Temukan buku bekas berkualitas dengan harga miring.
+* **Sewa Buku:** Hemat biaya dengan menyewa buku per semester (tersedia opsi durasi).
 
-## Teknologi yang Digunakan
+### 🔍 Pencarian Cerdas
+* **Filter Lengkap:** Cari buku berdasarkan Judul, Penulis, Kategori Mata Kuliah, hingga Semester.
+* **Kondisi Buku:** Transparansi kondisi buku (Baru, Bekas Premium, Bekas Usang).
 
-Aplikasi ini dibangun menggunakan stack teknologi modern yang handal:
+### 📱 Pengalaman Pengguna
+* **Mobile-First Design:** Tampilan responsif yang nyaman diakses melalui smartphone.
+* **Manajemen Keranjang:** Simpan item impian Anda dan checkout sekaligus.
+* **Riwayat Transaksi:** Pantau status pembelian dan penjualan secara real-time.
 
-- Laravel 10: Framework PHP yang ekspresif dan elegan.
+### ⭐ Reputasi & Keamanan
+* **Rating & Review:** Lihat ulasan pembeli sebelumnya untuk memastikan kredibilitas penjual dan kualitas buku.
+* **Autentikasi Aman:** Sistem login dan registrasi yang terlindungi.
 
-- MySQL: Sistem manajemen database relasional yang kuat.
+---
 
-- Blade Templates: Mesin templating yang sederhana namun kuat.
+## 🛠️ Teknologi yang Digunakan
 
-- Tailwind CSS: Framework CSS utility-first untuk desain UI yang cepat dan kustom.
+Aplikasi ini dibangun di atas fondasi teknologi modern untuk memastikan performa dan skalabilitas:
 
-## Panduan Instalasi
+| Teknologi | Deskripsi |
+| :--- | :--- |
+| **Laravel 12** | Framework PHP terbaru yang ekspresif dan elegan. |
+| **PHP 8.2** | Bahasa pemrograman server-side yang efisien. |
+| **MySQL** | Sistem manajemen database relasional yang handal. |
+| **Blade Templates** | Mesin templating bawaan Laravel yang kuat. |
+| **Tailwind CSS** | Framework CSS *utility-first* untuk desain UI yang cepat dan modern. |
 
-Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lingkungan lokal Anda:
+---
+
+## 👥 Kontributor
+
+Terima kasih kepada tim pengembang yang telah berkontribusi dalam pembangunan proyek Bookuy (PPPL B).
+
+| No | Nama | NRP | Username GitHub |
+| :-- | :--- | :--- | :--- |
+| 1 | Fadhiil Akmal Hamizan | 5026231128 | [Axmalz](https://github.com/Axmalz) |
+| 2 | James Melvin Chandra | - | - |
+| 3 | Ananda Donelly Reksana | - | - |
+| 4 | Hafiyyuddin Ahmad | - | - |
+| 5 | Putu Arya Yubi Wirayudha | - | - |
+
+---
+
+## 💻 Panduan Instalasi (Lokal)
+
+Ikuti langkah berikut untuk menjalankan proyek di komputer Anda:
 
 ### Prasyarat
-
-Pastikan Anda telah menginstal:
-
-PHP >= 8.1
-
-Composer
-
-Node.js & NPM (Opsional)
-
-MySQL
+Pastikan perangkat Anda sudah terinstal:
+* PHP >= 8.2
+* Composer
+* MySQL
+* Node.js & NPM (Opsional untuk aset frontend)
 
 ### Langkah-langkah
 
-### 1. Clone Repositori:
+1.  **Clone Repositori**
+    ```bash
+    git clone [https://github.com/Axmalz/bookuy.git](https://github.com/Axmalz/bookuy.git)
+    cd bookuy
+    ```
 
-git clone [https://github.com/username/bookuy.git](https://github.com/username/bookuy.git)
-cd bookuy
+2.  **Instal Dependensi PHP**
+    ```bash
+    composer install
+    ```
 
+3.  **Konfigurasi Environment**
+    Salin file `.env.example` menjadi `.env`:
+    ```bash
+    cp .env.example .env
+    ```
+    Sesuaikan konfigurasi database di file `.env`:
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=bookuy_db
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
 
-### 2. Instal Dependensi PHP:
+4.  **Generate App Key**
+    ```bash
+    php artisan key:generate
+    ```
 
-composer install
+5.  **Migrasi Database & Seeding**
+    Jalankan perintah ini untuk membuat tabel dan mengisi data dummy (User, Buku, Kategori, dll):
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
 
+6.  **Setup Frontend (Opsional)**
+    Jika ingin mengedit aset CSS/JS:
+    ```bash
+    npm install && npm run build
+    ```
 
-### 3. Konfigurasi Environment:
+7.  **Jalankan Server**
+    ```bash
+    php artisan serve
+    ```
 
-Salin file contoh .env dan sesuaikan dengan konfigurasi database Anda.
+8.  **Selesai!**
+    Buka browser dan kunjungi: `http://localhost:8000`
 
-cp .env.example .env
+---
 
+## 📂 Struktur Proyek
 
-Buka file .env dan atur kredensial database:
+* **`app/Http/Controllers/`**: Logika utama aplikasi (Chat, Checkout, Product, dll).
+* **`app/Models/`**: Representasi data (User, Book, Order, Review).
+* **`database/migrations/`**: Struktur skema database.
+* **`resources/views/`**: Halaman antarmuka pengguna (Blade).
+* **`routes/web.php`**: Definisi rute aplikasi.
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=bookuy_db
-DB_USERNAME=root
-DB_PASSWORD=
-
-
-### 4. Generate App Key:
-
-php artisan key:generate
-
-
-### 5. Migrasi Database & Seeding:
-
-Jalankan perintah ini untuk membuat tabel dan mengisi data dummy (termasuk 30 user random, buku, kategori, dan review).
-
-php artisan migrate:fresh --seed
-
-
-### 6. Jalankan Server:
-
-php artisan serve
-
-
-### 7. Akses Aplikasi:
-
-Buka browser Anda dan kunjungi http://localhost:8000.
-
-## Struktur Proyek
-
-Gambaran singkat struktur folder utama dalam proyek Bookuy:
-
-- app/Http/Controllers/: Logika aplikasi (AuthController, HomeController, ProductController, dll).
-
-- app/Models/: Definisi model Eloquent (User, Book, Category, Review, Cart).
-
-- database/migrations/: Skema database.
-
-    - database/seeders/: Data awal untuk pengujian.
-
-- resources/views/: Tampilan antarmuka pengguna (Blade templates).
-
-- public/images/: Aset gambar statis.
-
-## Kontributor
-
-Terima kasih kepada tim pengembang yang luar biasa:
-
-- James Melvin Chandra
-
-- Fadhiil Akmal Hamizan
-
-- Ananda Donelly Reksana
-
-- Hafiyyuddin Ahmad
-
-- Putu Arya Yubi Wirayudha
+---
