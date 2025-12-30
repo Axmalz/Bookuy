@@ -23,7 +23,8 @@
     </div>
 
     <!-- 2. Form Content -->
-    <div class="flex-grow overflow-y-auto px-6 pt-8 pb-32 relative z-0">
+    <!-- Menambahkan class no-scrollbar agar konsisten -->
+    <div class="flex-grow overflow-y-auto px-6 pt-8 pb-32 relative z-0 no-scrollbar">
         <h2 class="font-bold text-gray-900 text-lg mb-6">Add Debit or Credit Card</h2>
 
         <form id="card-form">
@@ -52,9 +53,6 @@
                     <p class="text-xs text-gray-400 mt-1 ml-1">3 digits on back</p>
                 </div>
             </div>
-
-            <!-- Add Card Button (Moved to bottom via absolute positioning in parent container or just placed here if flex-col is used correctly, but user asked for 'at the bottom of the page') -->
-             <!-- We will use a fixed bottom container to ensure it's always at the bottom like other pages -->
         </form>
     </div>
 
@@ -81,6 +79,11 @@
     </div>
 </div>
 
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
 <script>
     const form = document.getElementById('card-form');
     const inputs = [document.getElementById('card_number'), document.getElementById('expiry_date'), document.getElementById('cvc')];
@@ -92,7 +95,7 @@
     function checkInputs() {
         const allFilled = inputs.every(input => input.value.trim() !== '');
 
-        // Tambahan validasi panjang karakter (opsional, tapi disarankan)
+        // Tambahan validasi panjang karakter
         const cardNumber = document.getElementById('card_number').value.replace(/\D/g, '');
         const expiryDate = document.getElementById('expiry_date').value;
         const cvc = document.getElementById('cvc').value.replace(/\D/g, '');
@@ -142,7 +145,10 @@
 
         fetch('{{ route("payment.store") }}', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
         })
         .then(response => response.json())
         .then(data => {

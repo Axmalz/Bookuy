@@ -37,10 +37,19 @@
                     <!-- 1. Gambar Lama (Existing) -->
                     @foreach($book->gambar_buku as $img)
                     <div class="relative rounded-lg overflow-hidden aspect-[2/3] group image-slot existing-image">
-                        <img src="{{ $img }}" class="w-full h-full object-cover">
+                        <!-- PERBAIKAN LOGIKA GAMBAR -->
+                        @php
+                            $imgSrc = asset('images/illustration-no-books.png');
+                            if (Illuminate\Support\Str::startsWith($img, 'http')) {
+                                $imgSrc = $img;
+                            } else {
+                                $filename = basename($img);
+                                $imgSrc = asset('books/' . $filename);
+                            }
+                        @endphp
+                        <img src="{{ $imgSrc }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
 
                         <!-- Input Hidden untuk menjaga gambar ini saat save -->
-                        <!-- Jika elemen ini dihapus, gambar ini tidak akan dikirim kembali ke server, artinya dihapus -->
                         <input type="hidden" name="keep_images[]" value="{{ $img }}">
 
                         <!-- Tombol Hapus (Silang Merah) -->
@@ -55,7 +64,6 @@
                     <!-- 2. Gambar Baru akan disisipkan di sini via JS -->
 
                     <!-- 3. Tombol Add Photo -->
-                    <!-- Div pembungkus tombol add, ID: add-photo-wrapper -->
                     <div id="add-photo-wrapper" class="aspect-[2/3] {{ count($book->gambar_buku) >= 3 ? 'hidden' : '' }}">
                         <label class="w-full h-full border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-blue-500 hover:text-blue-500 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mb-1">
@@ -68,9 +76,7 @@
                 </div>
 
                 <!-- Container untuk Input File (Hidden) -->
-                <!-- Kita butuh wadah ini untuk menampung input file yang BELUM dipilih -->
                 <div id="file-inputs-holder" class="hidden">
-                    <!-- Input pertama -->
                     <input type="file" name="new_images[]" class="file-input-trigger" accept="image/*" onchange="handleFileSelect(this)">
                 </div>
 
@@ -89,7 +95,7 @@
                 <input type="text" name="nama_penulis" value="{{ old('nama_penulis', $book->nama_penulis) }}" class="w-full border-2 border-gray-200 rounded-full px-4 py-3 text-sm focus:border-blue-500 outline-none transition-colors">
             </div>
 
-            <!-- Harga (Flex Row) -->
+            <!-- Harga -->
             <div class="flex gap-4">
                 <div class="flex-1">
                     <label class="font-bold text-sm text-gray-800 mb-1 block">Harga Beli</label>
@@ -101,7 +107,7 @@
                 </div>
             </div>
 
-            <!-- STOK (Flex Row - BARU) -->
+            <!-- STOK -->
             <div class="flex gap-4">
                 <div class="flex-1">
                     <label class="font-bold text-sm text-gray-800 mb-1 block">Stok Beli</label>
@@ -119,7 +125,7 @@
                 <textarea name="deskripsi_buku" rows="4" class="w-full border-2 border-gray-200 rounded-3xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-colors resize-none">{{ old('deskripsi_buku', $book->deskripsi_buku) }}</textarea>
             </div>
 
-            <!-- Kondisi (Dropdown) -->
+            <!-- Kondisi -->
             <div class="form-group">
                 <label class="font-bold text-sm text-gray-800 mb-1 block">Kondisi Buku</label>
                 <div class="relative">
@@ -138,7 +144,7 @@
                 <input type="text" name="alamat_buku" value="{{ old('alamat_buku', $book->alamat_buku) }}" class="w-full border-2 border-gray-200 rounded-full px-4 py-3 text-sm focus:border-blue-500 outline-none transition-colors">
             </div>
 
-            <!-- Kategori (Dropdown Names) -->
+            <!-- Kategori -->
             <div class="form-group">
                 <label class="font-bold text-sm text-gray-800 mb-1 block">Category</label>
                 <div class="relative">
@@ -182,22 +188,18 @@
 </div>
 
 <script>
-    // Logic untuk tombol Add Photo (Label)
-    // Saat label diklik, trigger input file yang sedang 'standby' (yang terakhir dibuat)
     const addPhotoBtn = document.getElementById('add-photo-wrapper');
     addPhotoBtn.addEventListener('click', function() {
         const activeInput = document.querySelector('#file-inputs-holder .file-input-trigger:last-child');
         if(activeInput) activeInput.click();
     });
 
-    // Handle saat file dipilih
     function handleFileSelect(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                // 1. Buat elemen preview visual (div)
                 const previewDiv = document.createElement('div');
                 previewDiv.className = 'relative rounded-lg overflow-hidden aspect-[2/3] group image-slot new-image border-2 border-blue-500';
 
@@ -211,49 +213,34 @@
                     </button>
                 `;
 
-                // 2. PINDAHKAN input file yang sudah ada isinya KE DALAM previewDiv
-                // Ini trik kuncinya: Input file menjadi anak dari div preview.
-                // Jadi kalau div preview dihapus, input filenya juga ikut terhapus.
-                input.classList.add('hidden'); // Sembunyikan input aslinya
-                input.removeAttribute('onchange'); // Hapus listener agar tidak memicu event lagi
+                input.classList.add('hidden');
+                input.removeAttribute('onchange');
                 previewDiv.appendChild(input);
 
-                // 3. Masukkan preview ke grid (sebelum tombol Add Photo)
                 const grid = document.getElementById('image-grid');
                 grid.insertBefore(previewDiv, addPhotoBtn);
 
-                // 4. SIAPKAN input file BARU untuk slot berikutnya
-                // Kita buat elemen input baru yang bersih dan taruh di #file-inputs-holder
                 const newInput = document.createElement('input');
                 newInput.type = 'file';
-                newInput.name = 'new_images[]'; // Array name sama, backend akan terima array
+                newInput.name = 'new_images[]';
                 newInput.className = 'file-input-trigger';
                 newInput.accept = 'image/*';
                 newInput.onchange = function() { handleFileSelect(this); };
 
                 document.getElementById('file-inputs-holder').appendChild(newInput);
-
-                // 5. Cek slot apakah sudah penuh
                 checkSlots();
             }
             reader.readAsDataURL(file);
         }
     }
 
-    // Fungsi Hapus Gambar
     function removeImage(btn) {
-        // Hapus elemen parent (div.image-slot) dari DOM
-        // Ini secara otomatis menghapus apa pun yang ada di dalamnya:
-        // - Jika gambar lama: Input hidden 'keep_images[]' ikut terhapus -> Backend akan tahu gambar ini dihapus.
-        // - Jika gambar baru: Input file 'new_images[]' yang kita pindahkan tadi ikut terhapus -> File tidak akan terkirim.
         const slot = btn.closest('.image-slot');
         slot.remove();
         checkSlots();
     }
 
-    // Fungsi Cek Slot (Maksimal 3)
     function checkSlots() {
-        // Hitung semua elemen dengan class .image-slot (baik lama maupun baru)
         const currentImages = document.querySelectorAll('.image-slot').length;
         const addBtn = document.getElementById('add-photo-wrapper');
 

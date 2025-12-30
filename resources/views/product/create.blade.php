@@ -1,4 +1,4 @@
-@extends('layouts.app-main') <!-- DIUBAH: Menggunakan app-main agar ada navbar -->
+@extends('layouts.app-main')
 <!--
 // Kode ditulis oleh :
 // Nama  : Fadhiil Akmal Hamizan
@@ -6,7 +6,7 @@
 // NRP   : 5026231128
 // Kelas : PPPL B
 -->
-@section('main-content') <!-- DIUBAH: Mengisi section 'main-content' milik app-main -->
+@section('main-content')
 
 <!-- FIX: Override CSS untuk menghilangkan blok putih -->
 @push('styles')
@@ -26,7 +26,7 @@
 
     <!-- 1. Header Biru -->
     <div class="w-full bg-blue-600 pt-12 pb-6 rounded-b-[40px] shadow-md z-20 relative px-6 flex-shrink-0">
-        <!-- MODIFIKASI 1: Tombol Back DIHAPUS -->
+        <!-- MODIFIKASI 1: Tombol Back DIHAPUS (karena pakai navbar bawah) -->
         <div class="flex items-center justify-center relative mb-2 h-6">
             <!-- Kosong (Placeholder agar layout judul tetap rapi jika diperlukan) -->
         </div>
@@ -184,9 +184,10 @@
 </div>
 
 <script>
-    // LOGIKA JS GAMBAR (Sama dengan Edit)
+    // LOGIKA JS GAMBAR
     const addPhotoBtn = document.getElementById('add-photo-wrapper');
     addPhotoBtn.addEventListener('click', function() {
+        // Cari input file terakhir yang masih kosong (trigger)
         const activeInput = document.querySelector('#file-inputs-holder .file-input-trigger:last-child');
         if(activeInput) activeInput.click();
     });
@@ -197,6 +198,7 @@
             const reader = new FileReader();
 
             reader.onload = function(e) {
+                // 1. Buat elemen preview
                 const previewDiv = document.createElement('div');
                 previewDiv.className = 'relative rounded-lg overflow-hidden aspect-[2/3] group image-slot new-image border-2 border-blue-500';
 
@@ -210,13 +212,16 @@
                     </button>
                 `;
 
+                // 2. Pindahkan input ke dalam previewDiv agar ikut terhapus jika div dihapus
                 input.classList.add('hidden');
                 input.removeAttribute('onchange');
                 previewDiv.appendChild(input);
 
+                // 3. Masukkan ke grid
                 const grid = document.getElementById('image-grid');
                 grid.insertBefore(previewDiv, addPhotoBtn);
 
+                // 4. Siapkan input file baru untuk slot berikutnya
                 const newInput = document.createElement('input');
                 newInput.type = 'file';
                 newInput.name = 'new_images[]';
@@ -241,6 +246,7 @@
         const currentImages = document.querySelectorAll('.image-slot').length;
         const addBtn = document.getElementById('add-photo-wrapper');
 
+        // Batasi maksimal 3 gambar
         if (currentImages >= 3) {
             addBtn.classList.add('hidden');
         } else {

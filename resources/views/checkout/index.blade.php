@@ -52,6 +52,45 @@
 
         <div class="h-px bg-gray-100 w-full mb-6"></div>
 
+        <!-- ITEMS LIST (DITAMBAHKAN AGAR BISA CEK GAMBAR) -->
+        <div class="mb-6">
+            <h3 class="font-bold text-gray-900 text-base mb-3">Items</h3>
+            <div class="space-y-3">
+                @foreach($cartItems as $item)
+                <div class="flex gap-3 bg-white border border-gray-100 p-3 rounded-2xl shadow-sm items-center">
+                    <!-- Gambar Buku dengan Logika Baru -->
+                    <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative border border-gray-200">
+                        @php
+                            $imgSrc = asset('images/illustration-no-books.png');
+                            if (isset($item->book->gambar_buku) && !empty($item->book->gambar_buku)) {
+                                $img = is_array($item->book->gambar_buku) ? $item->book->gambar_buku[0] : $item->book->gambar_buku;
+                                if (Illuminate\Support\Str::startsWith($img, 'http')) {
+                                    $imgSrc = $img;
+                                } else {
+                                    // REVISI: Mengambil file dari folder 'public/books'
+                                    $filename = basename($img);
+                                    $imgSrc = asset('books/' . $filename);
+                                }
+                            }
+                        @endphp
+                        <img src="{{ $imgSrc }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+                    </div>
+                    
+                    <div class="flex-grow min-w-0">
+                        <h4 class="font-bold text-gray-800 text-sm line-clamp-1">{{ $item->book->judul_buku }}</h4>
+                        <p class="text-xs text-gray-400 capitalize">{{ $item->type }} • {{ $item->quantity }} {{ $item->type == 'sewa' ? 'Sem' : 'Pcs' }}</p>
+                    </div>
+                    
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-blue-600 font-bold text-sm">Rp {{ number_format(($item->type == 'sewa' ? $item->book->harga_sewa : $item->book->harga_beli) * $item->quantity, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="h-px bg-gray-100 w-full mb-6"></div>
+
         <!-- Payment Method -->
         <div class="mb-6">
             <h3 class="font-bold text-gray-900 text-base mb-3">Payment Method</h3>

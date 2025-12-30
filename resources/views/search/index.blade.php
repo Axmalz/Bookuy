@@ -79,17 +79,18 @@
                                 <div class="w-full h-full bg-gray-200">
                                     <!-- PERBAIKAN LOGIKA GAMBAR -->
                                     @php
-                                        $imgSrc = '';
+                                        $imgSrc = asset('images/illustration-no-books.png');
                                         if (isset($book->gambar_buku[0])) {
                                             $img = $book->gambar_buku[0];
                                             if (Str::startsWith($img, 'http')) {
                                                 $imgSrc = $img;
                                             } else {
-                                                $imgSrc = asset('storage/' . $img);
+                                                $filename = basename($img);
+                                                $imgSrc = asset('books/' . $filename);
                                             }
                                         }
                                     @endphp
-                                    <img src="{{ $imgSrc }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <img src="{{ $imgSrc }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                                 </div>
                             </a>
 

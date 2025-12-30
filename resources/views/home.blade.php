@@ -85,13 +85,14 @@
                     <div class="w-full aspect-[9/16] bg-gray-200 rounded-lg overflow-hidden shadow-sm border border-transparent group-hover:border-blue-300 group-hover:shadow-md transition-all duration-300 relative">
                         <!-- PERBAIKAN LOGIKA GAMBAR -->
                         @php
-                            $imgSrc = '';
-                            if (isset($book->gambar_buku[0])) {
-                                $img = $book->gambar_buku[0];
-                                if (Str::startsWith($img, 'http')) {
+                            $imgSrc = asset('images/illustration-no-books.png');
+                            if (isset($book->gambar_buku) && !empty($book->gambar_buku)) {
+                                $img = is_array($book->gambar_buku) ? $book->gambar_buku[0] : $book->gambar_buku;
+                                if (Illuminate\Support\Str::startsWith($img, 'http')) {
                                     $imgSrc = $img;
                                 } else {
-                                    $imgSrc = asset('storage/' . $img);
+                                    $filename = basename($img);
+                                    $imgSrc = asset('books/' . $filename);
                                 }
                             }
                         @endphp
@@ -123,13 +124,14 @@
                             <div class="w-full h-full bg-gray-200">
                                 <!-- PERBAIKAN LOGIKA GAMBAR -->
                                 @php
-                                    $imgSrc = '';
-                                    if (isset($book->gambar_buku[0])) {
-                                        $img = $book->gambar_buku[0];
-                                        if (Str::startsWith($img, 'http')) {
+                                    $imgSrc = asset('images/illustration-no-books.png');
+                                    if (isset($book->gambar_buku) && !empty($book->gambar_buku)) {
+                                        $img = is_array($book->gambar_buku) ? $book->gambar_buku[0] : $book->gambar_buku;
+                                        if (Illuminate\Support\Str::startsWith($img, 'http')) {
                                             $imgSrc = $img;
                                         } else {
-                                            $imgSrc = asset('storage/' . $img);
+                                            $filename = basename($img);
+                                            $imgSrc = asset('books/' . $filename);
                                         }
                                     }
                                 @endphp

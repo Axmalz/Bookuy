@@ -25,8 +25,9 @@
 
         <!-- Foto Profil -->
         <div class="w-20 h-20 rounded-full border-4 border-white/30 overflow-hidden bg-gray-200 shadow-md flex-shrink-0">
+            <!-- PERBAIKAN: Menambahkan cache busting (?v=time) -->
             @if(Auth::user()->profile_photo_path)
-                <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" class="w-full h-full object-cover">
+                <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) . '?v=' . time() }}" class="w-full h-full object-cover">
             @else
                 <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=random&size=128" class="w-full h-full object-cover">
             @endif

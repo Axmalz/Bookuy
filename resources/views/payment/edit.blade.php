@@ -21,7 +21,8 @@
         </div>
     </div>
 
-    <div class="flex-grow overflow-y-auto px-6 pt-8 pb-32 relative z-0">
+    <!-- Menambahkan class no-scrollbar -->
+    <div class="flex-grow overflow-y-auto px-6 pt-8 pb-32 relative z-0 no-scrollbar">
         <h2 class="font-bold text-gray-900 text-lg mb-6">Edit Debit or Credit Card</h2>
 
         <form id="card-form">
@@ -70,10 +71,42 @@
     </div>
 </div>
 
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
 <script>
     const form = document.getElementById('card-form');
     const successModal = document.getElementById('success-modal');
     const successContent = document.getElementById('success-content');
+    const submitBtn = document.getElementById('submit-btn');
+    const inputs = [document.getElementById('card_number'), document.getElementById('expiry_date'), document.getElementById('cvc')];
+
+    // Validation Logic (sama dengan create)
+    function checkInputs() {
+        const allFilled = inputs.every(input => input.value.trim() !== '');
+
+        const cardNumber = document.getElementById('card_number').value.replace(/\D/g, '');
+        const expiryDate = document.getElementById('expiry_date').value;
+        const cvc = document.getElementById('cvc').value.replace(/\D/g, '');
+
+        const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+
+        const isCardValid = cardNumber.length === 16;
+        const isExpiryValid = expiryRegex.test(expiryDate);
+        const isCvcValid = cvc.length === 3;
+
+        if (allFilled && isCardValid && isExpiryValid && isCvcValid) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
+            submitBtn.classList.add('bg-blue-600', 'shadow-lg', 'hover:bg-blue-700', 'active:scale-95');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
+            submitBtn.classList.remove('bg-blue-600', 'shadow-lg', 'hover:bg-blue-700', 'active:scale-95');
+        }
+    }
 
     // Format input MM/YY otomatis
     document.getElementById('expiry_date').addEventListener('input', function(e) {
@@ -82,14 +115,17 @@
             input = input.substring(0, 2) + '/' + input.substring(2, 4);
         }
         e.target.value = input;
+        checkInputs();
     });
 
     // Hanya angka untuk Card Number dan CVC
     document.getElementById('card_number').addEventListener('input', function(e) {
         e.target.value = e.target.value.replace(/\D/g, '');
+        checkInputs();
     });
     document.getElementById('cvc').addEventListener('input', function(e) {
         e.target.value = e.target.value.replace(/\D/g, '');
+        checkInputs();
     });
 
     form.addEventListener('submit', function(e) {
@@ -98,7 +134,10 @@
 
         fetch('{{ route("payment.update", $card->id) }}', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
         })
         .then(response => response.json())
         .then(data => {
@@ -113,5 +152,8 @@
         })
         .catch(error => alert('Error updating card'));
     });
+
+    // Initial check saat halaman load (karena data sudah terisi)
+    checkInputs();
 </script>
 @endsection

@@ -37,11 +37,12 @@
             <div class="flex flex-col items-center">
                 <div class="w-28 h-28 rounded-full border-4 border-blue-50 overflow-hidden bg-gray-200 shadow-lg relative group">
                     <!-- Preview Image -->
+                    <!-- PERBAIKAN: Menambahkan ?v=time() agar gambar langsung terupdate tanpa cache -->
                     <img id="profile-preview"
-                         src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=random&size=128' }}"
+                         src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=random&size=128' }}"
                          class="w-full h-full object-cover">
 
-                    <!-- Overlay Upload saat Hover (Menggunakan PNG Icon Camera) -->
+                    <!-- Overlay Upload saat Hover -->
                     <label for="profile_photo" class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                         <img src="{{ asset('images/icon-camera-white.png') }}" alt="Change" class="w-8 h-8">
                     </label>
@@ -89,8 +90,8 @@
                             <option value="{{ $sem }}" {{ $user->semester == $sem ? 'selected' : '' }}>{{ $sem }}</option>
                         @endforeach
                     </select>
-                     <!-- Chevron Icon (SVG) -->
-                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                      <!-- Chevron Icon (SVG) -->
+                      <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                         </svg>

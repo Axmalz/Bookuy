@@ -95,13 +95,20 @@
                     <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 relative">
                         <!-- PERBAIKAN LOGIKA GAMBAR -->
                         @php
-                            $imgSrc = '';
-                            if (isset($item->book->gambar_buku[0])) {
-                                $img = $item->book->gambar_buku[0];
+                            $imgSrc = asset('images/illustration-no-books.png'); // Default fallback
+                            
+                            // Cek jika gambar ada
+                            if (isset($item->book->gambar_buku) && !empty($item->book->gambar_buku)) {
+                                // Ambil elemen pertama jika array, atau string langsung
+                                $img = is_array($item->book->gambar_buku) ? $item->book->gambar_buku[0] : $item->book->gambar_buku;
+                                
                                 if (Illuminate\Support\Str::startsWith($img, 'http')) {
                                     $imgSrc = $img;
                                 } else {
-                                    $imgSrc = asset('storage/' . $img);
+                                    // REVISI: Mengambil file dari folder 'public/books'
+                                    // basename() digunakan untuk membuang path lama (misal: 'post-images/foto.jpg' menjadi 'foto.jpg')
+                                    $filename = basename($img);
+                                    $imgSrc = asset('books/' . $filename);
                                 }
                             }
                         @endphp
@@ -149,7 +156,8 @@
                                     <button onclick="updateQty({{ $item->id }}, -1, {{ $maxSem }})" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors active:scale-90">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" /></svg>
                                     </button>
-                                    <span class="text-xs font-bold text-gray-600 px-2 whitespace-nowrap select-none">{{ $item->quantity }} Semester</span>
+                                    <!-- Menambahkan ID agar script updateQty bisa menemukan elemen ini -->
+                                    <span id="qty-text-{{ $item->id }}" class="text-xs font-bold text-gray-600 px-2 whitespace-nowrap select-none">{{ $item->quantity }} Semester</span>
                                     <button onclick="updateQty({{ $item->id }}, 1, {{ $maxSem }})" class="w-6 h-6 flex items-center justify-center {{ $item->quantity >= $maxSem ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-blue-600 active:scale-90' }} transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                                     </button>
@@ -232,19 +240,24 @@
     }
 
     function updateQty(itemId, change, maxStock) {
+        // Ambil elemen quantity berdasarkan ID
         const qtySpan = document.getElementById('qty-text-' + itemId);
-        let currentQty = parseInt(qtySpan.innerText);
-        let newQty = currentQty + change;
+        
+        // Cek dulu apakah elemen ditemukan (prevent error null pointer)
+        if (qtySpan) {
+            let currentQty = parseInt(qtySpan.innerText);
+            let newQty = currentQty + change;
 
-        // Cek Max (Client Side)
-        if (newQty > maxStock) return;
+            // Cek Max (Client Side)
+            if (newQty > maxStock) return;
+            if (newQty < 1) return;
+        }
 
-        if (newQty < 1) return;
-
+        // Kirim request update
         fetch(`{{ url('/cart/update') }}/${itemId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify({ quantity: newQty })
+            body: JSON.stringify({ quantity: qtySpan ? (parseInt(qtySpan.innerText) + change) : change })
         })
         .then(response => response.json())
         .then(data => {

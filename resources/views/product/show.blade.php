@@ -51,12 +51,18 @@
 
                 @foreach($book->gambar_buku as $index => $img)
                 <div class="carousel-item absolute transition-all duration-500 ease-out shadow-2xl rounded-lg overflow-hidden bg-gray-200" data-index="{{ $index }}">
-                    <!-- LOGIKA GAMBAR DIPERBAIKI -->
-                    @if(Str::startsWith($img, 'http'))
-                        <img src="{{ $img }}" class="w-full h-full object-cover">
-                    @else
-                        <img src="{{ asset('storage/' . $img) }}" class="w-full h-full object-cover">
-                    @endif
+                    <!-- PERBAIKAN LOGIKA GAMBAR CAROUSEL -->
+                    @php
+                        $imgSrc = asset('images/illustration-no-books.png');
+                        if (Str::startsWith($img, 'http')) {
+                            $imgSrc = $img;
+                        } else {
+                            // Mengambil file dari folder 'public/books'
+                            $filename = basename($img);
+                            $imgSrc = asset('books/' . $filename);
+                        }
+                    @endphp
+                    <img src="{{ $imgSrc }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                     <div class="blur-layer absolute inset-0 bg-white/30 backdrop-blur-[2px] opacity-0 transition-opacity duration-500"></div>
                 </div>
                 @endforeach
@@ -265,7 +271,21 @@
 
             <div id="modal-content-confirm" class="px-6 pb-8 overflow-y-auto">
                 <div class="flex gap-4 mb-6">
-                    <img src="{{ isset($book->gambar_buku[0]) ? (Str::startsWith($book->gambar_buku[0], 'http') ? $book->gambar_buku[0] : asset('storage/' . $book->gambar_buku[0])) : '' }}" class="w-24 h-24 rounded-xl object-cover shadow-md flex-shrink-0">
+                    <!-- PERBAIKAN LOGIKA GAMBAR MODAL -->
+                    @php
+                        $modalImgSrc = asset('images/illustration-no-books.png');
+                        if (isset($book->gambar_buku[0])) {
+                            $img = $book->gambar_buku[0];
+                            if (Str::startsWith($img, 'http')) {
+                                $modalImgSrc = $img;
+                            } else {
+                                $filename = basename($img);
+                                $modalImgSrc = asset('books/' . $filename);
+                            }
+                        }
+                    @endphp
+                    <img src="{{ $modalImgSrc }}" class="w-24 h-24 rounded-xl object-cover shadow-md flex-shrink-0" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+                    
                     <div class="flex-grow min-w-0">
                         <h3 class="font-bold text-lg leading-tight mb-1 truncate">{{ $book->judul_buku }}</h3>
                         <p class="text-xs text-gray-500 mb-2">{{ $book->nama_penulis }}</p>
