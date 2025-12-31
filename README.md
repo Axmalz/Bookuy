@@ -1,5 +1,3 @@
-# 📚 Bookuy
-
 ![Bookuy Banner](public/images/logo-color-full.png)
 
 > **Platform Jual-Beli & Penyewaan Buku Bekas Khusus Mahasiswa**
@@ -20,8 +18,8 @@ Kami percaya pendidikan harus dapat diakses oleh semua orang. Dengan fitur **Jua
 Bookuy dirancang dengan pendekatan *user-centric* untuk memberikan pengalaman terbaik:
 
 ### 🛒 Transaksi Fleksibel
-* **Jual & Beli:** Temukan buku bekas berkualitas dengan harga miring.
-* **Sewa Buku:** Hemat biaya dengan menyewa buku per semester (tersedia opsi durasi).
+* **Jual & Beli:** Temukan buku bekas berkualitas dengan harga pantas.
+* **Sewa Buku:** Hemat biaya dengan menyewa buku per semester (tersedia opsi durasi sewa).
 
 ### 🔍 Pencarian Cerdas
 * **Filter Lengkap:** Cari buku berdasarkan Judul, Penulis, Kategori Mata Kuliah, hingga Semester.
@@ -59,10 +57,10 @@ Terima kasih kepada tim pengembang yang telah berkontribusi dalam pembangunan pr
 | No | Nama | NRP | Username GitHub |
 | :-- | :--- | :--- | :--- |
 | 1 | Fadhiil Akmal Hamizan | 5026231128 | [Axmalz](https://github.com/Axmalz) |
-| 2 | James Melvin Chandra | - | - |
-| 3 | Ananda Donelly Reksana | - | - |
-| 4 | Hafiyyuddin Ahmad | - | - |
-| 5 | Putu Arya Yubi Wirayudha | - | - |
+| 2 | James Melvin Chandra | 5026231076 | - |
+| 3 | Ananda Donelly Reksana | 5026231149 | - |
+| 4 | Hafiyyuddin Ahmad | 5026231156 | - |
+| 5 | Putu Arya Yubi Wirayudha | 5026231165 | - |
 
 ---
 
